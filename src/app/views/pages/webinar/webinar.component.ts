@@ -41,6 +41,7 @@ export class WebinarComponent implements OnInit {
   webinarForm: FormGroup;
   adminId: string = '';
   adminName: string = '';
+  formSubmitted: boolean = false;
 
   Math = Math;
 
@@ -174,6 +175,7 @@ export class WebinarComponent implements OnInit {
     this.showWebinarModal = true;
     this.editMode = !!webinar;
     this.editingWebinarId = webinar?._id || null;
+    this.formSubmitted = false; // Reset form submitted flag
 
     if (webinar) {
       this.webinarForm.patchValue({
@@ -206,6 +208,7 @@ export class WebinarComponent implements OnInit {
     this.showWebinarModal = false;
     this.editMode = false;
     this.editingWebinarId = null;
+    this.formSubmitted = false; // Reset form submitted flag
     this.webinarForm.reset({
       host: this.adminId,
       hostName: this.adminName,
@@ -216,6 +219,7 @@ export class WebinarComponent implements OnInit {
   }
 
   async submitWebinar(): Promise<void> {
+    this.formSubmitted = true;
     if (this.webinarForm.invalid) {
       this.webinarForm.markAllAsTouched();
       this.logFormErrors();
@@ -278,7 +282,28 @@ export class WebinarComponent implements OnInit {
       }
     } catch (error: any) {
       console.error('Error saving webinar:', error);
-      swalHelper.showToast(error.message || 'Failed to save webinar', 'error');
+      
+      // Extract error message from different possible locations
+      let errorMessage = 'Failed to save webinar';
+      
+      if (error?.error?.message) {
+        // API returned error with message property
+        errorMessage = error.error.message;
+      } else if (error?.error?.error) {
+        // API returned error with error property
+        errorMessage = error.error.error;
+      } else if (error?.response?.data?.message) {
+        // Alternative error response structure
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        // Generic error message
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        // Error is a string
+        errorMessage = error;
+      }
+      
+      swalHelper.showToast(errorMessage, 'error');
     } finally {
       this.modalLoading = false;
       this.cdr.detectChanges();
@@ -295,9 +320,30 @@ export class WebinarComponent implements OnInit {
       } else {
         swalHelper.showToast(response.message || 'Failed to delete webinar', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting webinar:', error);
-      swalHelper.showToast('Failed to delete webinar', 'error');
+      
+      // Extract error message from different possible locations
+      let errorMessage = 'Failed to delete webinar';
+      
+      if (error?.error?.message) {
+        // API returned error with message property
+        errorMessage = error.error.message;
+      } else if (error?.error?.error) {
+        // API returned error with error property
+        errorMessage = error.error.error;
+      } else if (error?.response?.data?.message) {
+        // Alternative error response structure
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        // Generic error message
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        // Error is a string
+        errorMessage = error;
+      }
+      
+      swalHelper.showToast(errorMessage, 'error');
     } finally {
       this.loading = false;
       this.cdr.detectChanges();

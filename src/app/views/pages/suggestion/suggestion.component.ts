@@ -89,7 +89,7 @@ export class SuggestionComponent implements OnInit {
       this.suggestions = response.suggestions.docs;
       this.analytics = response.analytics;
       this.totalDocs = response.suggestions.totalDocs;
-      this.currentPage = response.suggestions.page;
+      this.filters.page = response.suggestions.page;
       this.totalPages = response.suggestions.totalPages;
       
       this.cdr.detectChanges();

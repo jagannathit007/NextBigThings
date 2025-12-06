@@ -89,7 +89,7 @@ export class ComplainComponent implements OnInit {
       this.complaints = response.complaints.docs;
       this.analytics = response.analytics;
       this.totalDocs = response.complaints.totalDocs;
-      this.currentPage = response.complaints.page;
+      this.filters.page = response.complaints.page;
       this.totalPages = response.complaints.totalPages;
       
       this.cdr.detectChanges();

@@ -49,11 +49,10 @@ export class WebinarService {
         this.headers
       );
       
-      swalHelper.showToast('Webinar created successfully', 'success');
       return response;
     } catch (error) {
       console.error('Create Webinar Error:', error);
-      swalHelper.showToast('Failed to create webinar', 'error');
+      // Don't show toast here, let the component handle it with the actual error message
       throw error;
     }
   }
@@ -145,11 +144,10 @@ export class WebinarService {
         this.headers
       );
       
-      swalHelper.showToast('Webinar updated successfully', 'success');
       return response;
     } catch (error) {
       console.error('Update Webinar Error:', error);
-      swalHelper.showToast('Failed to update webinar', 'error');
+      // Don't show toast here, let the component handle it with the actual error message
       throw error;
     }
   }

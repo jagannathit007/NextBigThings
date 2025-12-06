@@ -1,21 +1,25 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { GoalsService } from '../../../services/goals.service';
 import { Goal, GoalsResponse, GoalsAnalytics } from '../../../interface/goals.interface';
 import { swalHelper } from '../../../core/constants/swal-helper';
 import { debounceTime, Subject } from 'rxjs';
 
+declare var $: any;
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-goals',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPaginationModule],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, NgSelectModule],
   providers: [GoalsService],
   templateUrl: './goals.component.html',
   styleUrls: ['./goals.component.scss'],
 })
-export class GoalsComponent implements OnInit {
+export class GoalsComponent implements OnInit, AfterViewInit {
   goals: Goal[] = [];
   analytics: GoalsAnalytics = {
     total_goals: 0,
@@ -53,7 +57,11 @@ export class GoalsComponent implements OnInit {
     id: 'goals-pagination',
   };
 
+  searchQuery: string = '';
+  goalDetailsModal: any;
+
   private filterSubject = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   constructor(
     private goalsService: GoalsService,
@@ -62,9 +70,33 @@ export class GoalsComponent implements OnInit {
     this.filterSubject.pipe(debounceTime(300)).subscribe(() => {
       this.fetchGoals();
     });
+    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+      this.fetchGoals();
+    });
   }
 
   ngOnInit(): void {
+    this.filterSubject.next();
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      const modalElement = document.getElementById('goalDetailsModal');
+      if (modalElement) {
+        this.goalDetailsModal = new bootstrap.Modal(modalElement);
+      } else {
+        console.warn('Modal element not found in the DOM');
+      }
+    }, 300);
+  }
+
+  onSearch(): void {
+    this.filters.page = 1;
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  onChange(): void {
+    this.filters.page = 1;
     this.filterSubject.next();
   }
 
@@ -74,6 +106,7 @@ export class GoalsComponent implements OnInit {
       const requestParams = {
         page: this.filters.page,
         limit: this.filters.limit,
+        search: this.searchQuery || undefined,
         status: this.filters.status || undefined,
         category: this.filters.category || undefined,
       };
@@ -113,16 +146,39 @@ export class GoalsComponent implements OnInit {
       status: '',
       category: '',
     };
+    this.searchQuery = '';
     this.filterSubject.next();
   }
 
   openGoalModal(goal: Goal): void {
     this.selectedGoal = goal;
     this.showGoalModal = true;
+    if (this.goalDetailsModal) {
+      this.goalDetailsModal.show();
+    } else {
+      try {
+        const modalElement = document.getElementById('goalDetailsModal');
+        if (modalElement) {
+          const modalInstance = new bootstrap.Modal(modalElement);
+          this.goalDetailsModal = modalInstance;
+          modalInstance.show();
+        } else {
+          $('#goalDetailsModal').modal('show');
+        }
+      } catch (error) {
+        console.error('Error showing modal:', error);
+        $('#goalDetailsModal').modal('show');
+      }
+    }
     this.cdr.detectChanges();
   }
 
   closeGoalModal(): void {
+    if (this.goalDetailsModal) {
+      this.goalDetailsModal.hide();
+    } else {
+      $('#goalDetailsModal').modal('hide');
+    }
     this.showGoalModal = false;
     this.selectedGoal = null;
     this.cdr.detectChanges();

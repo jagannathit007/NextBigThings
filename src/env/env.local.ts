@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  baseURL: 'http://localhost:3200',
+  baseURL: 'http://localhost:4190',
   route: 'admin',
-  imageUrl:'http://localhost:3200/',
+  imageUrl:'http://localhost:4190/',
   
   };
 

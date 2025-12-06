@@ -208,16 +208,7 @@ export class SideBarService {
               link: 'banners',
               icon: 'banner',
             },
-            {
-              title: 'Badges',
-              link: 'badges',
-              icon: 'award',
-            },
-            {
-              title: 'Badge Management',
-              link: 'badgeManagement',
-              icon: 'cog',
-            },
+           
             {
               title: 'Training',
               link: 'podcasts',

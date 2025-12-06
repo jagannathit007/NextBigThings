@@ -407,7 +407,28 @@ export class SessionsComponent implements OnInit, AfterViewInit {
       }
     } catch (error: any) {
       console.error('Error saving session:', error);
-      swalHelper.showToast(error.message || 'Failed to save session', 'error');
+      
+      // Extract error message from different possible locations
+      let errorMessage = 'Failed to save session';
+      
+      if (error?.error?.message) {
+        // API returned error with message property
+        errorMessage = error.error.message;
+      } else if (error?.error?.error) {
+        // API returned error with error property
+        errorMessage = error.error.error;
+      } else if (error?.response?.data?.message) {
+        // Alternative error response structure
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        // Generic error message
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        // Error is a string
+        errorMessage = error;
+      }
+      
+      swalHelper.showToast(errorMessage, 'error');
     } finally {
       this.loading = false;
     }

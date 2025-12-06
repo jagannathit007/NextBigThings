@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
     <!-- Header with Analytics -->
-    <div class="card-header bg-gradient-primary py-4">
+    <div class="card-header bg-gradient-primary py-3">
       <div class="row align-items-center">
         <div class="col-md-6">
           <h4 class="mb-0 fw-bold text-white">
@@ -42,7 +42,7 @@
 
     <!-- Filters Section -->
     <div class="card-body p-0">
-      <div class="d-flex flex-wrap justify-content-between align-items-center p-3 border-bottom bg-light">
+      <div class="d-flex flex-wrap justify-content-between align-items-center p-3 border-bottom">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-2 mb-md-0">
           <div class="me-2" style="min-width: 180px;">
             <label for="statusSelect" class="form-label mb-1">Status</label>
@@ -124,8 +124,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let complaint of complaints; let i = index" class="border-bottom">
-            <td class="py-3">{{ (currentPage - 1) * limit + i + 1 }}</td>
+          <tr *ngFor="let complaint of complaints | paginate: {itemsPerPage: filters.limit, currentPage: filters.page, totalItems: totalDocs}; let i=index" class="border-bottom">
+            <td class="py-3">{{ (filters.page - 1) * filters.limit + i + 1 }}</td>
             
             <!-- User Info -->
             <td class="py-3">
@@ -197,17 +197,9 @@
         </tbody>
       </table>
 
-      <!-- Pagination -->
-      <div class="d-flex justify-content-between align-items-center p-3 border-top">
-        <div *ngIf="complaints && complaints.length > 0" class="text-muted">
-          Showing {{ (currentPage - 1) * limit + 1 }} to
-          {{ Math.min(currentPage * limit, totalDocs) }}
-          of {{ totalDocs }} entries
-        </div>
-        <pagination-controls
-          [id]="paginationConfig.id"
-          [maxSize]="5"
-          [responsive]="true"
+      <!-- Pagination Controls -->
+      <div class="d-flex justify-content-end p-3">
+        <pagination-controls 
           (pageChange)="onPageChange($event)"
           previousLabel="Previous"
           nextLabel="Next"

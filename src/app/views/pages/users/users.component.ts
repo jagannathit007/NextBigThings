@@ -68,14 +68,18 @@ export class UsersComponent implements OnInit, AfterViewInit {
     name: '',
     mobile_number: '',
     email: '',
-    meeting_role: '',
+    city: '',
+    state: '',
+    country: '',
     batchId: ''
   };
   editError = {
     name: '',
     mobile_number: '',
     email: '',
-    meeting_role: '',
+    city: '',
+    state: '',
+    country: '',
     batchId: ''
   };
   editLoading: boolean = false;
@@ -149,10 +153,29 @@ export class UsersComponent implements OnInit, AfterViewInit {
         page: 1,
         limit: 1000
       });
-      this.batches = response.data?.batches?.docs || [];
+      console.log('Batches response:', response);
+      // Handle different possible response structures
+      if (response?.data?.batches?.docs) {
+        this.batches = response.data.batches.docs;
+      } else if (response?.data?.docs) {
+        this.batches = response.data.docs;
+      } else if (response?.batches?.docs) {
+        this.batches = response.batches.docs;
+      } else if (response?.docs) {
+        this.batches = response.docs;
+      } else if (Array.isArray(response?.data)) {
+        this.batches = response.data;
+      } else if (Array.isArray(response)) {
+        this.batches = response;
+      } else {
+        this.batches = [];
+        console.warn('Unexpected batch response structure:', response);
+      }
+      console.log('Batches loaded:', this.batches);
     } catch (error) {
       console.error('Error fetching batches:', error);
       swalHelper.showToast('Failed to fetch batches', 'error');
+      this.batches = [];
     } finally {
       this.batchesLoading = false;
       this.cdr.detectChanges();
@@ -400,10 +423,12 @@ export class UsersComponent implements OnInit, AfterViewInit {
       name: user.name || '',
       mobile_number: user.mobile_number || '',
       email: user.email || '',
-      meeting_role: user.meeting_role || '',
+      city: user.city || '',
+      state: user.state || '',
+      country: user.country || '',
       batchId: user.batchId?._id || ''
     };
-    this.editError = { name: '', mobile_number: '', email: '', meeting_role: '', batchId: '' };
+    this.editError = { name: '', mobile_number: '', email: '', city: '', state: '', country: '', batchId: '' };
 
     if (this.editUserModal) {
       this.editUserModal.show();
@@ -434,7 +459,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
   validateEditForm(): boolean {
     let isValid = true;
-    this.editError = { name: '', mobile_number: '', email: '', meeting_role: '', batchId: '' };
+    this.editError = { name: '', mobile_number: '', email: '', city: '', state: '', country: '', batchId: '' };
 
     if (!this.editForm.name.trim()) {
       this.editError.name = 'Name is required';
@@ -452,10 +477,6 @@ export class UsersComponent implements OnInit, AfterViewInit {
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.editForm.email)) {
       this.editError.email = 'Invalid email format';
-      isValid = false;
-    }
-    if (!this.editForm.meeting_role) {
-      this.editError.meeting_role = 'Meeting role is required';
       isValid = false;
     }
     if (!this.editForm.batchId) {
@@ -551,6 +572,35 @@ export class UsersComponent implements OnInit, AfterViewInit {
   formatDate(dateString: string): string {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
+  }
+
+  // Helper methods to display data with N/A fallback
+  getDisplayValue(value: any, fallback: string = 'N/A'): string {
+    if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+      return fallback;
+    }
+    return value;
+  }
+
+  getArrayDisplayValue(arr: any[], index: number = 0, field: string = '', fallback: string = 'N/A'): string {
+    if (!arr || arr.length === 0 || !arr[index]) {
+      return fallback;
+    }
+    const value = arr[index][field];
+    return this.getDisplayValue(value, fallback);
+  }
+
+  getNestedValue(obj: any, path: string, fallback: string = 'N/A'): string {
+    if (!obj) return fallback;
+    const keys = path.split('.');
+    let value = obj;
+    for (const key of keys) {
+      if (value === null || value === undefined) {
+        return fallback;
+      }
+      value = value[key];
+    }
+    return this.getDisplayValue(value, fallback);
   }
 
   async generateUserPDF(): Promise<void> {

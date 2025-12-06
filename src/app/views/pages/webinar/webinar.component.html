@@ -184,8 +184,8 @@
               {{ editMode ? 'Update Webinar' : 'Save Webinar' }}
             </button>
             <!-- Debug info -->
-            <div *ngIf="webinarForm.invalid" class="text-danger small mt-2">
-              Form is invalid. Check console for details.
+            <div *ngIf="formSubmitted && webinarForm.invalid" class="text-danger small mt-2">
+              Form is invalid. Please check the fields above for errors.
             </div>
           </div>
         </div>

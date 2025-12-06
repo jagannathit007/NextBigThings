@@ -438,7 +438,7 @@ export class AuthService {
     }
 }
 
-async updateUser(userId: string, data: { name: string; mobile_number: string; email: string; meeting_role: string }): Promise<any> {
+async updateUser(userId: string, data: { name: string; mobile_number: string; email: string; city?: string; state?: string; country?: string; batchId?: string }): Promise<any> {
   try {
     this.getHeaders();
     const response = await this.apiManager.request(
@@ -1774,7 +1774,7 @@ export class EventService {
         return response;
       } catch (error) {
         console.error('Create Session Error:', error);
-        swalHelper.showToast('Failed to create session', 'error');
+        // Don't show toast here, let the component handle it with the actual error message
         throw error;
       }
     }
@@ -1797,7 +1797,7 @@ export class EventService {
         return response;
       } catch (error) {
         console.error('Update Session Error:', error);
-        swalHelper.showToast('Failed to update session', 'error');
+        // Don't show toast here, let the component handle it with the actual error message
         throw error;
       }
     }

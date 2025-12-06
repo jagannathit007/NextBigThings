@@ -1,11 +1,13 @@
 /* Analytics Component Styles */
 
 .bg-gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  background-size: 200% 200%;
+  color: white;
+  animation: gradientShift 3s ease infinite;
 }
 
 .card {
-  border-radius: 20px !important;
   transition: all 0.3s ease;
   
   &:hover {
@@ -14,7 +16,6 @@
   }
   
   .card-header {
-    border-radius: 20px 20px 0 0 !important;
     border: none;
   }
 }
@@ -135,8 +136,7 @@
 
 /* Chart Container */
 .chart-container {
-  .chart-placeholder {
-    border: 2px dashed #dee2e6;
+  .chart-placeholder { border: 2px dashed #dee2e6;
     border-radius: 10px;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     
@@ -377,11 +377,6 @@
 }
 
 /* Header gradient animation */
-.bg-gradient-primary {
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease infinite;
-}
-
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
