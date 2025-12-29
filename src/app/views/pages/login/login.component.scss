@@ -55,20 +55,25 @@ $border-radius: 16px;
   padding: 20px;
   position: relative;
   overflow: hidden;
+  background-image: url('https://www.shutterstock.com/shutterstock/videos/3501876979/thumb/1.jpg?ip=x480');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
-  // Animated background elements
+  // Background overlay for opacity
   &::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 30% 70%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
-    animation: float 6s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
     z-index: 0;
   }
 
+  // Animated background elements
   &::after {
     content: '';
     position: absolute;
@@ -96,6 +101,8 @@ $border-radius: 16px;
   border: 2px solid rgba(220, 38, 38, 0.2);
   display: flex;
   min-height: 600px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
 
   &::before {
     content: '';
