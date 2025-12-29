@@ -391,30 +391,14 @@
                   </div>
                 </div>
               </ng-template>
-              <!-- Additional Information Card -->
+              <!-- Batch Information Card -->
               <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-light py-3">
-                  <h6 class="mb-0 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Additional Information</h6>
+                  <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-check-fill me-2"></i> Batch Information</h6>
                 </div>
                 <div class="card-body">
                   <div class="row mb-3">
-                    <div class="col-md-6">
-                      <p class="mb-1 text-muted small">Device ID:</p>
-                      <p class="fw-bold">{{getDisplayValue(selectedUser.deviceId)}}</p>
-                    </div>
-                    <div class="col-md-6">
-                      <p class="mb-1 text-muted small">FCM Token:</p>
-                      <p class="fw-bold text-truncate" style="max-width: 300px;" [title]="selectedUser.fcm || 'N/A'">
-                        {{getDisplayValue(selectedUser.fcm)}}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <p class="mb-1 text-muted small">Verification Code:</p>
-                      <p class="fw-bold">{{getDisplayValue(selectedUser.verificationCode)}}</p>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <p class="mb-1 text-muted small">Batch:</p>
                       <p class="fw-bold">{{selectedUser.batchId?.name || 'N/A'}}</p>
                     </div>
@@ -479,16 +463,52 @@
             <div *ngIf="editError.email" class="text-danger small mt-1">{{editError.email}}</div>
           </div>
           <div class="mb-3">
-            <label for="editCity" class="form-label">City</label>
-            <input type="text" class="form-control" id="editCity" [(ngModel)]="editForm.city" name="city" placeholder="Enter city">
+            <label for="editCountry" class="form-label">Country</label>
+            <ng-select
+              id="editCountry"
+              [items]="countries"
+              bindLabel="name"
+              bindValue="name"
+              placeholder="Select country"
+              [(ngModel)]="editForm.country"
+              name="country"
+              [loading]="countriesLoading"
+              (change)="onEditCountryChange()"
+              [clearable]="true">
+            </ng-select>
           </div>
           <div class="mb-3">
             <label for="editState" class="form-label">State</label>
-            <input type="text" class="form-control" id="editState" [(ngModel)]="editForm.state" name="state" placeholder="Enter state">
+            <ng-select
+              id="editState"
+              [items]="states"
+              bindLabel="name"
+              bindValue="name"
+              placeholder="Select state"
+              [(ngModel)]="editForm.state"
+              name="state"
+              [loading]="statesLoading"
+              [disabled]="!editForm.country"
+              (change)="onEditStateChange()"
+              [clearable]="true">
+            </ng-select>
+            <small *ngIf="!editForm.country" class="text-muted">Please select a country first</small>
           </div>
           <div class="mb-3">
-            <label for="editCountry" class="form-label">Country</label>
-            <input type="text" class="form-control" id="editCountry" [(ngModel)]="editForm.country" name="country" placeholder="Enter country">
+            <label for="editCity" class="form-label">City</label>
+            <ng-select
+              id="editCity"
+              [items]="cities"
+              bindLabel="name"
+              bindValue="name"
+              placeholder="Select city"
+              [(ngModel)]="editForm.city"
+              name="city"
+              [loading]="citiesLoading"
+              [disabled]="!editForm.state"
+              [clearable]="true">
+            </ng-select>
+            <small *ngIf="!editForm.state" class="text-muted">Please select a state first</small>
           </div>
           <div class="mb-3">
             <label for="editBatch" class="form-label">Batch <span class="text-danger">*</span></label>

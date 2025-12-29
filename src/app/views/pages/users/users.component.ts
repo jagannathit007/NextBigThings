@@ -5,6 +5,9 @@ import { AuthService } from '../../../services/auth.service';
 import { ReferralService1 } from '../../../services/auth.service';
 import { ExportService } from '../../../services/export.service';
 import { BatchService } from '../../../services/auth.service';
+import { CountryService, Country } from '../../../services/auth.service';
+import { StateService, State } from '../../../services/auth.service';
+import { CityService, City } from '../../../services/auth.service';
 import { swalHelper } from '../../../core/constants/swal-helper';
 
 import { debounceTime, Subject } from 'rxjs';
@@ -22,7 +25,7 @@ declare var bootstrap: any;
   selector: 'app-users',
   standalone: true,
   imports: [CommonModule, FormsModule, NgxPaginationModule, NgSelectModule],
-  providers: [ExportService],
+  providers: [ExportService, CountryService, StateService, CityService],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -48,6 +51,12 @@ export class UsersComponent implements OnInit, AfterViewInit {
   referralLoading: boolean = false;
   pdfLoading: boolean = false;
   Math = Math;
+  countries: Country[] = [];
+  states: State[] = [];
+  cities: City[] = [];
+  countriesLoading: boolean = false;
+  statesLoading: boolean = false;
+  citiesLoading: boolean = false;
   notificationForm = {
     userId: '',
     title: '',
@@ -68,9 +77,9 @@ export class UsersComponent implements OnInit, AfterViewInit {
     name: '',
     mobile_number: '',
     email: '',
-    city: '',
-    state: '',
-    country: '',
+    city: '', // Will store city name, not ID
+    state: '', // Will store state name, not ID
+    country: '', // Will store country name, not ID
     batchId: ''
   };
   editError = {
@@ -109,6 +118,9 @@ export class UsersComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private referralService: ReferralService1,
     private batchService: BatchService,
+    private countryService: CountryService,
+    private stateService: StateService,
+    private cityService: CityService,
     private exportService: ExportService,
     private cdr: ChangeDetectorRef
   ) {
@@ -120,6 +132,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.fetchBatches();
     this.fetchUsers();
+    this.fetchCountriesForEdit();
   }
 
   ngAfterViewInit(): void {
@@ -416,19 +429,50 @@ export class UsersComponent implements OnInit, AfterViewInit {
     }
   }
 
-  editUser(user: any): void {
+  async editUser(user: any): Promise<void> {
     this.selectedUser = user;
+    
+    // Ensure countries are loaded first
+    await this.fetchCountriesForEdit();
+    
     // Initialize edit form with user data
+    let countryName = user.country || '';
+    
+    // If country looks like an ID (MongoDB ObjectId format), find the country name
+    if (countryName && countryName.length === 24 && /^[0-9a-fA-F]{24}$/.test(countryName)) {
+      const foundCountry = this.countries.find(c => c._id === countryName);
+      if (foundCountry) {
+        countryName = foundCountry.name;
+      } else {
+        // If not found in loaded countries, try to find it
+        countryName = '';
+      }
+    }
+    
     this.editForm = {
       name: user.name || '',
       mobile_number: user.mobile_number || '',
       email: user.email || '',
       city: user.city || '',
       state: user.state || '',
-      country: user.country || '',
+      country: countryName, // Use country name, not ID
       batchId: user.batchId?._id || ''
     };
     this.editError = { name: '', mobile_number: '', email: '', city: '', state: '', country: '', batchId: '' };
+    
+    // Reset states and cities
+    this.states = [];
+    this.cities = [];
+    
+    // If country exists (as name), fetch states for that country
+    if (this.editForm.country) {
+      await this.fetchStatesForEdit(this.editForm.country);
+      
+      // If state exists, fetch cities for that state
+      if (this.editForm.state) {
+        await this.fetchCitiesForEdit(this.editForm.state);
+      }
+    }
 
     if (this.editUserModal) {
       this.editUserModal.show();
@@ -446,6 +490,117 @@ export class UsersComponent implements OnInit, AfterViewInit {
         console.error('Error showing edit modal:', error);
         $('#editUserModal').modal('show');
       }
+    }
+  }
+
+  async fetchCountriesForEdit(): Promise<void> {
+    if (this.countries.length > 0) return; // Already loaded
+    
+    this.countriesLoading = true;
+    try {
+      const response = await this.countryService.getAllCountries({
+        page: 1,
+        limit: 1000,
+        search: ''
+      });
+      this.countries = response.docs || [];
+    } catch (error) {
+      console.error('Error fetching countries:', error);
+      this.countries = [];
+    } finally {
+      this.countriesLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async fetchStatesForEdit(countryName: string): Promise<void> {
+    if (!countryName) {
+      this.states = [];
+      this.editForm.state = '';
+      this.editForm.city = '';
+      this.cities = [];
+      return;
+    }
+
+    this.statesLoading = true;
+    try {
+      const response = await this.stateService.getAllStates({
+        page: 1,
+        limit: 1000,
+        search: '',
+        country_name: countryName
+      });
+      this.states = response.docs || [];
+      
+      // If current state doesn't exist in the fetched states, clear it
+      if (this.editForm.state && !this.states.find(s => s.name === this.editForm.state)) {
+        this.editForm.state = '';
+        this.editForm.city = '';
+        this.cities = [];
+      }
+    } catch (error) {
+      console.error('Error fetching states:', error);
+      this.states = [];
+    } finally {
+      this.statesLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async fetchCitiesForEdit(stateName: string): Promise<void> {
+    if (!stateName) {
+      this.cities = [];
+      this.editForm.city = '';
+      return;
+    }
+
+    this.citiesLoading = true;
+    try {
+      const response = await this.cityService.getAllCities({
+        page: 1,
+        limit: 1000,
+        search: '',
+        state_name: stateName
+      });
+      this.cities = response.docs || [];
+      
+      // If current city doesn't exist in the fetched cities, clear it
+      if (this.editForm.city && !this.cities.find(c => c.name === this.editForm.city)) {
+        this.editForm.city = '';
+      }
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      this.cities = [];
+    } finally {
+      this.citiesLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  onEditCountryChange(): void {
+    // When country changes, fetch states for that country
+    const selectedCountry = this.countries.find(c => c.name === this.editForm.country);
+    if (selectedCountry) {
+      this.fetchStatesForEdit(selectedCountry.name);
+      // Clear state and city when country changes
+      this.editForm.state = '';
+      this.editForm.city = '';
+      this.cities = [];
+    } else {
+      this.states = [];
+      this.cities = [];
+    }
+  }
+
+  onEditStateChange(): void {
+    // When state changes, fetch cities for that state
+    const selectedState = this.states.find(s => s.name === this.editForm.state);
+    if (selectedState) {
+      this.fetchCitiesForEdit(selectedState.name);
+      // Clear city when state changes
+      this.editForm.city = '';
+    } else {
+      this.cities = [];
     }
   }
 
