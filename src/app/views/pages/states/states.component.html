@@ -66,13 +66,13 @@
                 >
                   {{ state.name ? state.name.charAt(0).toUpperCase() : 'S' }}
                 </div>
-                <div>
-                  <div class="fw-bold text-dark">{{ state.name }}</div>
+                <div class="flex-grow-1" style="min-width: 0;">
+                  <div class="fw-bold text-dark text-truncate-name" [title]="state.name">{{ state.name }}</div>
                   <small class="text-muted d-block">ID: {{ state._id ? state._id.substring(0, 8) : 'N/A' }}</small>
                 </div>
               </div>
             </td>
-            <td class="py-3">{{ state.country_name || 'N/A' }}</td>
+            <td class="py-3 text-truncate-cell" [title]="state.country_name || 'N/A'">{{ state.country_name || 'N/A' }}</td>
             <td class="py-3">
               <span
                 class="badge rounded-pill"

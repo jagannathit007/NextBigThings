@@ -243,7 +243,7 @@ export class StatesComponent implements OnInit, AfterViewInit {
       }
     } catch (error) {
       console.error('Error saving state:', error);
-      swalHelper.showToast('Failed to save state', 'error');
+      // swalHelper.showToast('Failed to save state', 'error');
     } finally {
       this.loading = false;
     }

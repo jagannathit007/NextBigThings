@@ -64,7 +64,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
             name: ['', [Validators.required, Validators.minLength(3)]],
             date: ['', Validators.required],
             startTime: [''],
-            amount: [0],
+            amount: [0, [Validators.max(99999999)]],
             endTime: [''],
             mode: ['online'],
             event_or_meeting: ['', Validators.required],
@@ -279,6 +279,27 @@ export class EventsComponent implements OnInit, AfterViewInit {
             if (this.fullScreenImageModal) {
                 this.fullScreenImageModal.show();
             }
+        }
+    }
+
+    onAmountInput(event: any): void {
+        let value = event.target.value.toString();
+        // Remove non-numeric characters
+        value = value.replace(/[^0-9]/g, '');
+        
+        // Limit to 8 digits
+        if (value.length > 8) {
+            value = value.substring(0, 8);
+        }
+        
+        // Update the input and form value
+        const numValue = value ? parseInt(value, 10) : 0;
+        if (numValue > 99999999) {
+            event.target.value = '99999999';
+            this.eventForm.patchValue({ amount: 99999999 });
+        } else {
+            event.target.value = value;
+            this.eventForm.patchValue({ amount: numValue });
         }
     }
 

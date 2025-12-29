@@ -159,8 +159,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DashboardService, DashboardCounts, DashboardResponse, ChapterService, Chapter  } from '../../../services/auth.service';
-// Import ChapterService
+import { DashboardService, DashboardCounts, DashboardResponse } from '../../../services/auth.service';
 import { swalHelper } from '../../../core/constants/swal-helper';
 
 @Component({
@@ -188,35 +187,21 @@ export class DashboardComponent implements OnInit {
   };
 
   // Filter variables
-  chapters: Chapter[] = [];
-  selectedChapter: string = '';
   fromDate: string = '';
   toDate: string = '';
 
   constructor(
-    private dashboardService: DashboardService,
-    private chapterService: ChapterService // Replace CityService with ChapterService
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
-    this.loadChapters(); // Load chapters directly
     this.loadDashboardCounts();
-  }
-
-  async loadChapters(): Promise<void> {
-    try {
-      this.chapters = await this.chapterService.getAllChaptersForDropdown();
-    } catch (error) {
-      console.error('Failed to load chapters:', error);
-      swalHelper.showToast('Failed to load chapters', 'error');
-    }
   }
 
   async loadDashboardCounts(): Promise<void> {
     this.loading = true;
     try {
       const filters: any = {};
-      if (this.selectedChapter) filters.chapter = this.selectedChapter;
       if (this.fromDate) filters.fromDate = this.fromDate;
       if (this.toDate) filters.toDate = this.toDate;
 
@@ -245,7 +230,6 @@ export class DashboardComponent implements OnInit {
   }
 
   resetFilters(): void {
-    this.selectedChapter = '';
     this.fromDate = '';
     this.toDate = '';
     this.loadDashboardCounts();
@@ -253,12 +237,7 @@ export class DashboardComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.selectedChapter || this.fromDate || this.toDate);
-  }
-
-  clearChapterFilter(): void {
-    this.selectedChapter = '';
-    this.loadDashboardCounts();
+    return !!(this.fromDate || this.toDate);
   }
 
   clearFromDate(): void {

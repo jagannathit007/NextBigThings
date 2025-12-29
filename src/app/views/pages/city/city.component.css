@@ -84,6 +84,22 @@
     
   }
   
+  /* Text truncation with ellipsis */
+  .text-truncate-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .text-truncate-name {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .card-header {

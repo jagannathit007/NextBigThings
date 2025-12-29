@@ -66,3 +66,12 @@
   .table-hover > tbody > tr:hover {
     background-color: rgba(78, 115, 223, 0.05);
   }
+
+  /* Text truncation with ellipsis */
+  .text-truncate-name {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }

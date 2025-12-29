@@ -195,7 +195,7 @@ export class CountriesComponent implements OnInit, AfterViewInit {
       }
     } catch (error) {
       console.error('Error saving country:', error);
-      swalHelper.showToast('Failed to save country', 'error');
+      // swalHelper.showToast('Failed to save country', 'error');
     } finally {
       this.loading = false;
     }

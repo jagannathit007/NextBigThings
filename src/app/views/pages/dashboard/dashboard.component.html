@@ -40,12 +40,6 @@
                     <span class="text-muted me-2 small d-none d-sm-inline">Active Filters:</span>
                     <span class="text-muted me-2 small d-sm-none fw-bold">Filters:</span>
                     
-                    <span class="filter-chip" *ngIf="selectedChapter">
-                      <i class="bi bi-building me-1"></i>
-                      <span class="filter-text">{{ selectedChapter }}</span>
-                      <button class="btn-close-chip" (click)="clearChapterFilter()" aria-label="Clear chapter filter">×</button>
-                    </span>
-                    
                     <span class="filter-chip" *ngIf="fromDate">
                       <i class="bi bi-calendar me-1"></i>
                       <span class="filter-text">From: {{ fromDate }}</span>
@@ -69,24 +63,8 @@
                 <!-- Filter Form - Mobile Responsive -->
                 <form>
                   <div class="row g-3 align-items-end">
-                    <!-- Chapter Dropdown - Full width on mobile -->
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                      <label for="chapter" class="form-label fw-semibold">
-                        <i class="bi bi-building me-1"></i>Chapter
-                      </label>
-                      <select
-                        id="chapter"
-                        class="form-select modern-select"
-                        [(ngModel)]="selectedChapter"
-                        name="chapter"
-                      >
-                        <option value="">All Chapters</option>
-                        <option *ngFor="let chapter of chapters" [value]="chapter.name">{{ chapter.name }}</option>
-                      </select>
-                    </div>
-
                     <!-- Date Range Container - Responsive -->
-                    <div class="col-12 col-md-8 col-lg-6">
+                    <div class="col-12 col-md-8 col-lg-9">
                       <label class="form-label fw-semibold">
                         <i class="bi bi-calendar-range me-1"></i>Date Range
                       </label>
@@ -115,7 +93,7 @@
                     </div>
 
                     <!-- Action Buttons - Mobile Full Width -->
-                    <div class="col-12 col-md-12 col-lg-3">
+                    <div class="col-12 col-md-4 col-lg-3">
                       <div class="d-flex gap-2">
                         <button
                           type="button"

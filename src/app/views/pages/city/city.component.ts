@@ -252,7 +252,7 @@ export class CitiesComponent implements OnInit, AfterViewInit {
       }
     } catch (error) {
       console.error('Error saving city:', error);
-      swalHelper.showToast('Failed to save city', 'error');
+      // swalHelper.showToast('Failed to save city', 'error');
     } finally {
       this.loading = false;
     }

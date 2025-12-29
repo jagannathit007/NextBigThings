@@ -62,13 +62,13 @@
                 >
                   {{ city.name ? city.name.charAt(0).toUpperCase() : 'C' }}
                 </div>
-                <div>
-                  <div class="fw-bold text-dark">{{ city.name }}</div>
+                <div class="flex-grow-1" style="min-width: 0;">
+                  <div class="fw-bold text-dark text-truncate-name" [title]="city.name">{{ city.name }}</div>
                   <small class="text-muted d-block">ID: {{ city._id ? city._id.substring(0, 8) : 'N/A' }}</small>
                 </div>
               </div>
             </td>
-            <td class="py-3">{{ city.state_name || 'Unknown' }}</td>
+            <td class="py-3 text-truncate-cell" [title]="city.state_name || 'Unknown'">{{ city.state_name || 'Unknown' }}</td>
             <td class="py-3">
               <span
                 class="badge rounded-pill"

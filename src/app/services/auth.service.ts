@@ -148,9 +148,9 @@ export class CountryService {
       );
       
       return response;
-    } catch (error) {
+    } catch (error : any) {
       console.error('Create Country Error:', error);
-      swalHelper.showToast('Failed to create country', 'error');
+      swalHelper.showToast(error.error.message, 'error');
       throw error;
     }
   }
@@ -629,9 +629,9 @@ export class StateService {
           this.headers
         );
         return response;
-      } catch (error) {
+      } catch (error : any) {
         console.error('Create State Error:', error);
-        swalHelper.showToast('Failed to create state', 'error');
+        swalHelper.showToast(error.error.message, 'error');
         throw error;
       }
     }
@@ -757,7 +757,6 @@ export class DashboardService {
 
   async getDashboardCounts(filters: {
     city?: string;
-    chapter?: string;
     fromDate?: string;
     toDate?: string;
   } = {}): Promise<DashboardResponse> {
@@ -765,7 +764,6 @@ export class DashboardService {
       this.getHeaders();
       const queryParams = new URLSearchParams();
       if (filters.city) queryParams.append('city', filters.city);
-      if (filters.chapter) queryParams.append('chapter', filters.chapter);
       if (filters.fromDate) queryParams.append('fromDate', filters.fromDate);
       if (filters.toDate) queryParams.append('toDate', filters.toDate);
 
@@ -2116,9 +2114,9 @@ export class EventService {
           );
           
           return response;
-        } catch (error) {
+        } catch (error : any) {
           console.error('Create City Error:', error);
-          swalHelper.showToast('Failed to create city', 'error');
+          swalHelper.showToast(error.error.message, 'error');
           throw error;
         }
       }
