@@ -22,6 +22,7 @@ class ApiEndpoints {
   public UPDATE_COUNTRY: string = `${this.PATH}/updateCountry`
   public CONVERT_TO_USER: string = `${this.PATH}/convert-to-user`
   public GET_OTP: string = `${this.PATH}/getOtpRecords`
+  public DELETE_ALL_OTP: string = `${this.PATH}/deleteAllOtpRecords`
 
   // public GET_ANALYTICS_BY_DATE_RANGE = `${this.PATH}/getAnalyticsByDateRange`
 public GET_DASHBOARD_ANALYTICS = `${this.PATH}/getDashboardAnalytics`;

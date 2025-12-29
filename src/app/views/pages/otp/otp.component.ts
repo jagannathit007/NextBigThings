@@ -70,7 +70,7 @@ export class OtpRecordsComponent implements OnInit {
             this.cdr.detectChanges();
         } catch (error) {
             console.error('Error fetching OTP records:', error);
-            swalHelper.showToast('Failed to fetch OTP records', 'error');
+            // swalHelper.showToast('Failed to fetch OTP records', 'error');
         } finally {
             this.loading = false;
         }
@@ -95,5 +95,30 @@ export class OtpRecordsComponent implements OnInit {
     formatDate(dateString: string): string {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleDateString();
+    }
+
+    async deleteAllOtpRecords(): Promise<void> {
+        try {
+            const result = await swalHelper.confirmation(
+                'Delete All OTP Records',
+                'Are you sure you want to delete all OTP records? This action cannot be undone.',
+                'warning',
+                ['Yes, Delete All', 'Cancel']
+            );
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            this.loading = true;
+            await this.otpService.deleteAllOtpRecords();
+            swalHelper.showToast('All OTP records deleted successfully', 'success');
+            this.fetchOtpRecords();
+        } catch (error) {
+            console.error('Error deleting all OTP records:', error);
+            // Error is already handled in the service
+        } finally {
+            this.loading = false;
+        }
     }
 }

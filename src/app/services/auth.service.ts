@@ -2404,9 +2404,29 @@ export class EventService {
                   );
       
                   return response.data || response;
-              } catch (error) {
+              } catch (error : any) {
                   console.error('API Error:', error);
-                  swalHelper.showToast('Failed to fetch OTP records', 'error');
+                  swalHelper.showToast(error.error?.message , 'warning');
+                  throw error;
+              }
+          }
+
+          async deleteAllOtpRecords(): Promise<any> {
+              try {
+                  this.getHeaders();
+                  const response = await this.apiManager.request(
+                      {
+                          url: apiEndpoints.DELETE_ALL_OTP,
+                          method: 'DELETE',
+                      },
+                      null,
+                      this.headers
+                  );
+
+                  return response.data || response;
+              } catch (error: any) {
+                  console.error('Delete All OTP Records Error:', error);
+                  swalHelper.showToast(error.error?.message || 'Failed to delete all OTP records', 'error');
                   throw error;
               }
           }

@@ -4,8 +4,8 @@
      [class.active]="isSidebarOpen && isMobile" 
      (click)="closeSidebar()"></div>
 
-<!-- Sidebar Toggle Button for Mobile -->
-<button class="mobile-toggle-btn d-lg-none" 
+<!-- Sidebar Toggle Button for Mobile Only (Hidden on large screens) -->
+<button class="mobile-toggle-btn" 
         type="button" 
         (click)="toggleSidebar()"
         [class.active]="isSidebarOpen"
