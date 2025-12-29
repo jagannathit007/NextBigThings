@@ -23,7 +23,6 @@
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   }
   
   h5 {
@@ -273,7 +272,7 @@
 }
 
 .suggestion-reviewed {
-  border-left: 4px solid #17a2b8;
+  border-left: 4px solid #007bff;
 }
 
 .suggestion-implemented {
@@ -303,6 +302,13 @@
 
 .bi-lightbulb {
   color: #ffc107;
+}
+
+/* Image preview in modal */
+.img-fluid {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* Alert styles for admin response */
@@ -392,11 +398,11 @@
   cursor: pointer;
   
   &:hover {
-    background: linear-gradient(90deg, rgba(111,66,193,0.05), rgba(111,66,193,0.02));
+    background: linear-gradient(90deg, rgba(0,123,255,0.05), rgba(0,123,255,0.02));
   }
 }
 
-/* Status pulse animation for pending suggestions */
+/* Status pulse animation */
 @keyframes statusPulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
@@ -417,24 +423,10 @@
   }
 }
 
-/* Special styling for implemented suggestions */
-.badge.bg-success {
-  background: linear-gradient(45deg, #28a745, #20c997) !important;
-  box-shadow: 0 2px 4px rgba(40,167,69,0.3);
-}
-
-/* Category-specific card styling */
-.card-body {
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(to bottom, #6f42c1, #007bff);
-    border-radius: 0 0 0 10px;
-  }
+/* Text truncation for long content */
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

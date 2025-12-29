@@ -147,9 +147,14 @@
               <div>
                 <strong>{{ suggestion.title || 'No Title' }}</strong>
                 <br>
-                <small class="text-muted">{{ suggestion.details?.substring(0, 100) || 'No details' }}
+                <small class="text-muted">{{ suggestion.details.substring(0, 100) || 'No details' }}
                   <span *ngIf="suggestion.details && suggestion.details.length > 100">...</span>
                 </small>
+                <div *ngIf="suggestion.image" class="mt-1">
+                  <small class="text-info">
+                    <i class="bi bi-image me-1"></i>Has Image
+                  </small>
+                </div>
               </div>
             </td>
             
@@ -173,7 +178,9 @@
               <div>
                 <small class="text-muted">Created: {{ formatDate(suggestion.createdAt) }}</small>
                 <br>
-                <small class="text-muted">Updated: {{ formatDate(suggestion.updatedAt) }}</small>
+                <div *ngIf="suggestion.resolvedAt">
+                  <small class="text-success">Resolved: {{ formatDate(suggestion.resolvedAt) }}</small>
+                </div>
               </div>
             </td>
             
@@ -250,6 +257,11 @@
                   </div>
                 </div>
                 
+                <div *ngIf="selectedSuggestion.image" class="mt-3">
+                  <strong>Attached Image:</strong><br>
+                  <img [src]="selectedSuggestion.image" alt="Suggestion Image" class="img-fluid mt-2" style="max-height: 200px;">
+                </div>
+                
                 <div *ngIf="selectedSuggestion.adminResponse" class="mt-3">
                   <div class="alert alert-info">
                     <strong>Admin Response:</strong><br>
@@ -265,10 +277,10 @@
             <!-- User Info -->
             <div class="card border-0 bg-light mb-3">
               <div class="card-body">
-                <h6 class="card-title">Suggested By</h6>
+                <h6 class="card-title">Suggestion By</h6>
                 <div *ngIf="selectedSuggestion.userId" class="d-flex align-items-center">
                   <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                    {{ selectedSuggestion.userId.name?.charAt(0) || 'U' }}
+                    {{ selectedSuggestion.userId.name.charAt(0) || 'U' }}
                   </div>
                   <div>
                     <strong>{{ selectedSuggestion.userId.name || 'Unknown User' }}</strong>
@@ -299,6 +311,11 @@
                     <i class="bi bi-calendar-event text-info me-2"></i>
                     <strong>Last Updated:</strong><br>
                     <small class="ms-4">{{ formatDateTime(selectedSuggestion.updatedAt) }}</small>
+                  </div>
+                  <div *ngIf="selectedSuggestion.resolvedAt">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    <strong>Resolved:</strong><br>
+                    <small class="ms-4">{{ formatDateTime(selectedSuggestion.resolvedAt) }}</small>
                   </div>
                 </div>
               </div>

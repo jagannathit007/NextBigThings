@@ -147,7 +147,7 @@
               <div>
                 <strong>{{ complaint.title || 'No Title' }}</strong>
                 <br>
-                <small class="text-muted">{{ complaint.details?.substring(0, 100) || 'No details' }}
+                <small class="text-muted">{{ complaint.details.substring(0, 100) || 'No details' }}
                   <span *ngIf="complaint.details && complaint.details.length > 100">...</span>
                 </small>
                 <div *ngIf="complaint.image" class="mt-1">
@@ -280,7 +280,7 @@
                 <h6 class="card-title">Complaint By</h6>
                 <div *ngIf="selectedComplaint.userId" class="d-flex align-items-center">
                   <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                    {{ selectedComplaint.userId.name?.charAt(0) || 'U' }}
+                    {{ selectedComplaint.userId.name.charAt(0) || 'U' }}
                   </div>
                   <div>
                     <strong>{{ selectedComplaint.userId.name || 'Unknown User' }}</strong>

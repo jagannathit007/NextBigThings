@@ -228,7 +228,7 @@
                 </span>
               </td>
               <td class="py-3">{{ webinar.price || 'N/A' }}</td>
-              <td class="py-3">{{ webinar.registeredUsers?.length || 0 }}</td>
+              <td class="py-3">{{ webinar.registeredUsers.length || 0 }}</td>
               <td class="py-3">
                 <span class="badge" [ngClass]="{
                   'bg-success': webinar.status === 'live',

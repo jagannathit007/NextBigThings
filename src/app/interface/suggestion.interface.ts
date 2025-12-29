@@ -11,9 +11,11 @@ export interface Suggestion {
   userId: User;
   title: string;
   details: string;
+  image?: string;
   category: 'general' | 'feature' | 'improvement' | 'other';
   status: 'pending' | 'reviewed' | 'implemented' | 'rejected';
   adminResponse?: string;
+  resolvedAt?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

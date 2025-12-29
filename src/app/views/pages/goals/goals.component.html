@@ -354,7 +354,7 @@
                 <h6 class="card-title">Goal Owner</h6>
                 <div *ngIf="selectedGoal.user_id" class="d-flex align-items-center">
                   <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                    {{ selectedGoal.user_id.name?.charAt(0) || 'U' }}
+                    {{ selectedGoal.user_id.name.charAt(0) || 'U' }}
                   </div>
                   <div>
                     <strong>{{ selectedGoal.user_id.name || 'Unknown User' }}</strong>
