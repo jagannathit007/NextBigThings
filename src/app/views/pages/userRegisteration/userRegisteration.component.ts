@@ -81,9 +81,8 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.fetchCountries();
-    this.fetchStates();
-    this.fetchCities();
     this.fetchBatches();
+    // Don't fetch states and cities on init - wait for country/state selection
   }
 
   ngAfterViewInit(): void {
@@ -127,15 +126,35 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async fetchStates(): Promise<void> {
+  async fetchStates(countryId?: string): Promise<void> {
+    if (!countryId) {
+      this.states = [];
+      this.registerForm.state = null;
+      return;
+    }
+
+    // Find country name from selected country
+    const selectedCountry = this.countries.find(c => c._id === countryId);
+    if (!selectedCountry) {
+      this.states = [];
+      this.registerForm.state = null;
+      return;
+    }
+
     this.statesLoading = true;
     try {
       const response = await this.stateService.getAllStates({
         page: 1,
         limit: 1000,
-        search: ''
+        search: '',
+        country_name: selectedCountry.name
       });
       this.states = response.docs;
+      
+      // Reset state selection when states change
+      this.registerForm.state = null;
+      this.registerForm.city = null;
+      this.cities = [];
     } catch (error) {
       console.error('Error fetching states:', error);
       swalHelper.showToast('Failed to fetch states', 'error');
@@ -145,15 +164,33 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async fetchCities(): Promise<void> {
+  async fetchCities(stateId?: string): Promise<void> {
+    if (!stateId) {
+      this.cities = [];
+      this.registerForm.city = null;
+      return;
+    }
+
+    // Find state name from selected state
+    const selectedState = this.states.find(s => s._id === stateId);
+    if (!selectedState) {
+      this.cities = [];
+      this.registerForm.city = null;
+      return;
+    }
+
     this.citiesLoading = true;
     try {
       const response = await this.cityService.getAllCities({
         page: 1,
         limit: 1000,
-        search: ''
+        search: '',
+        state_name: selectedState.name
       });
       this.cities = response.docs;
+      
+      // Reset city selection when cities change
+      this.registerForm.city = null;
     } catch (error) {
       console.error('Error fetching cities:', error);
       swalHelper.showToast('Failed to fetch cities', 'error');
@@ -395,6 +432,20 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     if (fileInput) {
       fileInput.value = '';
     }
+
+    // Reset states and cities arrays
+    this.states = [];
+    this.cities = [];
+  }
+
+  onCountryChange(): void {
+    // When country changes, fetch states for that country
+    this.fetchStates(this.registerForm.country);
+  }
+
+  onStateChange(): void {
+    // When state changes, fetch cities for that state
+    this.fetchCities(this.registerForm.state);
   }
 
   async registerUser(): Promise<void> {

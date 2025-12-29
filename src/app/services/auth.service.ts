@@ -588,7 +588,7 @@ export class StateService {
     }
   };
 
-  async getAllStates(data: { page: number; limit: number; search: string }): Promise<StateResponse> {
+  async getAllStates(data: { page: number; limit: number; search: string; country_name?: string }): Promise<StateResponse> {
     try {
       this.getHeaders();
       
@@ -596,6 +596,9 @@ export class StateService {
       let queryParams = `?page=${data.page}&limit=${data.limit}`;
       if (data.search) {
         queryParams += `&search=${encodeURIComponent(data.search)}`;
+      }
+      if (data.country_name) {
+        queryParams += `&country_name=${encodeURIComponent(data.country_name)}`;
       }
       
       const response = await this.apiManager.request(
@@ -2072,7 +2075,7 @@ export class EventService {
         }
       };
     
-      async getAllCities(data: { page: number; limit: number; search: string }): Promise<CityResponse> {
+      async getAllCities(data: { page: number; limit: number; search: string; state_name?: string }): Promise<CityResponse> {
         try {
           this.getHeaders();
           
@@ -2080,6 +2083,9 @@ export class EventService {
           let queryParams = `?page=${data.page}&limit=${data.limit}`;
           if (data.search) {
             queryParams += `&search=${encodeURIComponent(data.search)}`;
+          }
+          if (data.state_name) {
+            queryParams += `&state_name=${encodeURIComponent(data.state_name)}`;
           }
           
           const response = await this.apiManager.request(
