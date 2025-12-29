@@ -8,6 +8,8 @@ import { swalHelper } from '../../../core/constants/swal-helper';
 import { debounceTime, Subject } from 'rxjs';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ImageCropperComponent } from 'ngx-image-cropper';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
 declare var bootstrap: any;
 declare var $: any;
 
@@ -15,7 +17,7 @@ declare var $: any;
 @Component({
   selector: 'app-banners',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPaginationModule, NgSelectModule],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, NgSelectModule, ImageCropperComponent],
   providers: [BannerService],
   templateUrl: './banner.component.html',
   styleUrls: ['./banner.component.css'],
@@ -37,6 +39,9 @@ export class BannersComponent implements OnInit, AfterViewInit {
   imagePreview: string | null = null;
   imageurl = environment.imageUrl;
   formSubmitted: boolean = false;
+  imageChangedEvent: any = '';
+  croppedImage: string | null = null;
+  showCropper: boolean = false;
   
   newBanner = {
     title: '',
@@ -134,47 +139,86 @@ export class BannersComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // Validate file size (5MB max)
-      const maxSize = 10 * 1024 * 1024; // 5MB in bytes
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
       if (file.size > maxSize) {
         swalHelper.showToast('File size should not exceed 10MB', 'error');
         return;
       }
 
-      
+      // Set image changed event for cropper
+      this.imageChangedEvent = event;
+      this.showCropper = true;
+      this.croppedImage = null;
+      this.imagePreview = null;
+      this.cdr.detectChanges();
+    }
+  }
 
-    // Validate image dimensions
-    const img = new Image();
-    img.src = window.URL.createObjectURL(file);
-    img.onload = () => {
-      const width = img.width;
-      const height = img.height;
-      const requiredWidth = 1200;
-      const requiredHeight = 400;
-
-      if (width !== requiredWidth || height !== requiredHeight) {
-        swalHelper.showToast(`Image must be ${requiredWidth}x${requiredHeight} pixels`, 'error');
-        window.URL.revokeObjectURL(img.src);
-        return;
-      }
-
-      this.selectedFile = file;
+  imageCropped(event: ImageCroppedEvent): void {
+    if (event.blob) {
+      // Use blob directly (better performance)
+      const file = new File([event.blob], 'banner-image.png', { type: 'image/png' });
       this.newBanner.image = file;
-
-      // Create image preview
+      
+      // Create preview from blob
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.imagePreview = e.target.result;
+        this.croppedImage = e.target.result;
+        this.imagePreview = this.croppedImage;
         this.cdr.detectChanges();
       };
-      reader.readAsDataURL(file);
-    };
-    img.onerror = () => {
-      swalHelper.showToast('Failed to load image for validation', 'error');
-      window.URL.revokeObjectURL(img.src);
-    };
+      reader.readAsDataURL(event.blob);
+    } else if (event.base64) {
+      // Fallback to base64 if blob not available
+      this.croppedImage = event.base64;
+      this.dataURLtoFile(event.base64, 'banner-image.png').then(file => {
+        this.newBanner.image = file;
+        this.imagePreview = this.croppedImage;
+        this.cdr.detectChanges();
+      }).catch(error => {
+        console.error('Error converting image:', error);
+        swalHelper.showToast('Error processing image', 'error');
+      });
+    }
   }
-}
+
+  imageLoaded(): void {
+    // Image loaded successfully
+  }
+
+  cropperReady(): void {
+    // Cropper ready
+  }
+
+  loadImageFailed(): void {
+    swalHelper.showToast('Failed to load image', 'error');
+    this.showCropper = false;
+    this.imageChangedEvent = '';
+  }
+
+  // Convert data URL to File
+  dataURLtoFile(dataurl: string, filename: string): Promise<File> {
+    return fetch(dataurl)
+      .then(res => res.blob())
+      .then(blob => {
+        return new File([blob], filename, { type: 'image/png' });
+      });
+  }
+
+  cancelCrop(): void {
+    this.showCropper = false;
+    this.imageChangedEvent = '';
+    this.croppedImage = null;
+    this.imagePreview = null;
+    this.newBanner.image = null;
+    // Reset file input
+    const fileInput = document.getElementById('bannerImage') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    this.cdr.detectChanges();
+  }
 
   openAddBannerModal(): void {
     this.editMode = false;
@@ -225,6 +269,9 @@ export class BannersComponent implements OnInit, AfterViewInit {
     this.selectedFile = null;
     this.imagePreview = null;
     this.formSubmitted = false;
+    this.imageChangedEvent = '';
+    this.croppedImage = null;
+    this.showCropper = false;
   }
   
   showModal(): void {
