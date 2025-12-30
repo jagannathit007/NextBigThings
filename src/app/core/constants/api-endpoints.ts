@@ -232,6 +232,8 @@ public GET_RECENT_ACTIVITIES = `${this.PATH}/getRecentActivities`;
 
   // Suggestion Management
   public GET_ALL_SUGGESTIONS: string = `${this.PATH1}/mobile/getAllSuggestions`;
+  public UPDATE_SUGGESTIONS: string = `${this.PATH1}/mobile/updateSuggestionStatus`;
+
   
 };
 

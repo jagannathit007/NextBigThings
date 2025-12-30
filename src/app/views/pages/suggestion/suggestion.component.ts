@@ -32,6 +32,12 @@ export class SuggestionComponent implements OnInit {
   loading: boolean = false;
   showSuggestionModal: boolean = false;
   selectedSuggestion: Suggestion | null = null;
+  
+  updateStatusData = {
+    status: '',
+    adminResponse: ''
+  };
+  isUpdating: boolean = false;
 
   // Pagination
   totalDocs: number = 0;
@@ -124,8 +130,35 @@ export class SuggestionComponent implements OnInit {
 
   openSuggestionModal(suggestion: Suggestion): void {
     this.selectedSuggestion = suggestion;
+    this.updateStatusData = {
+      status: suggestion.status || 'pending',
+      adminResponse: suggestion.adminResponse || ''
+    };
     this.showSuggestionModal = true;
     this.cdr.detectChanges();
+  }
+
+  async updateStatus(): Promise<void> {
+    if (!this.selectedSuggestion?._id) return;
+    
+    this.isUpdating = true;
+    try {
+      await this.suggestionService.updateSuggestionStatus(
+        this.selectedSuggestion._id,
+        this.updateStatusData.status,
+        this.updateStatusData.adminResponse
+      );
+      
+      swalHelper.showToast('Status updated successfully', 'success');
+      this.closeSuggestionModal();
+      this.fetchSuggestions(); // Refresh list
+    } catch (error) {
+      console.error('Update failed', error);
+      // Toast handled in service
+    } finally {
+      this.isUpdating = false;
+      this.cdr.detectChanges();
+    }
   }
 
   closeSuggestionModal(): void {

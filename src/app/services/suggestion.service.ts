@@ -56,4 +56,25 @@ export class SuggestionService {
       throw error;
     }
   }
+
+  async updateSuggestionStatus(id: string, status: string, adminResponse: string): Promise<any> {
+    try {
+      this.getHeaders();
+      const body = { status, adminResponse };
+      
+      const response = await this.apiManager.request(
+        {
+          url: `${apiEndpoints.UPDATE_SUGGESTIONS}/${id}`,
+          method: 'PUT',
+        },
+        body,
+        this.headers
+      );
+      return response;
+    } catch (error) {
+      console.error('Update Suggestion Status Error:', error);
+      swalHelper.showToast('Failed to update suggestion status', 'error');
+      throw error;
+    }
+  }
 }
