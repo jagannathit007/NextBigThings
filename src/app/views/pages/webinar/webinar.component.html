@@ -1,234 +1,160 @@
-
 <div class="container-fluid">
   <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    <!-- Header -->
     <div class="card-header bg-gradient-primary d-flex justify-content-between align-items-center py-3">
       <h4 class="mb-0 fw-bold text-white">
         <i class="bi bi-camera-video me-2"></i>Webinar Management
       </h4>
       <div class="action-buttons">
-        <button class="btn btn-sm btn-success me-2" (click)="openWebinarModal()">
+        <button class="btn btn-sm btn-light" (click)="openWebinarModal()">
           <i class="bi bi-plus-circle me-1"></i>Add Webinar
         </button>
       </div>
     </div>
-  <div class="card-body p-0">
-  <div class="d-flex flex-wrap justify-content-between align-items-end p-3 border-bottom">
-    <div class="d-flex flex-wrap align-items-end gap-2 mb-2 mb-md-0">
-      <!-- <div class="me-2" style="min-width: 200px;">
-        <label for="statusSelect" class="form-label mb-1">Status</label>
-        <select
-          id="statusSelect"
-          class="form-control"
-          [(ngModel)]="filters.status"
-          (change)="onFilterChange()">
-          <option value="">--Select Status--</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="live">Live</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-      </div>
-      <div class="me-2" style="min-width: 200px;">
-        <label for="accessTypeSelect" class="form-label mb-1">Access Type</label>
-        <select
-          id="accessTypeSelect"
-          class="form-control"
-          [(ngModel)]="filters.accessType"
-          (change)="onFilterChange()">
-          <option value="">--Select Access Type--</option>
-          <option value="free">Free</option>
-          <option value="paid">Paid</option>
-        </select>
-      </div> -->
-      <div class="me-2" style="min-width: 250px;">
-        <label for="searchInput" class="form-label mb-1">Search</label>
-        <input
-          id="searchInput"
-          type="text"
-          class="form-control"
-          [(ngModel)]="filters.search"
-          (input)="onFilterChange()"
-          placeholder="Search webinars">
-      </div>
-      <div>
-        <button class="btn btn-outline-secondary" (click)="resetFilters()">
-          <i class="bi bi-x-circle me-1"></i>Reset
-        </button>
-      </div>
-    </div>
-    <div class="ms-auto">
-      <select
-        id="limitSelect"
-        class="form-control"
-        [(ngModel)]="filters.limit"
-        (change)="onFilterChange()"
-        style="min-width: 120px;">
-        <option value="10">10 per page</option>
-        <option value="25">25 per page</option>
-        <option value="50">50 per page</option>
-        <option value="100">100 per page</option>
-      </select>
-    </div>
-  </div>
-</div>
 
-    <!-- Add/Edit Webinar Modal -->
-    <div *ngIf="showWebinarModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ editMode ? 'Edit Webinar' : 'Add New Webinar' }}</h5>
-            <button type="button" class="btn-close" (click)="closeWebinarModal()" [disabled]="modalLoading"></button>
+    <!-- Filters -->
+    <div class="card-body p-0">
+      <div class="d-flex flex-wrap justify-content-between align-items-end p-3 border-bottom bg-light">
+        <div class="d-flex flex-wrap align-items-end gap-2 mb-2 mb-md-0">
+          <!-- Status Filter -->
+          <div style="min-width: 150px;">
+            <label class="form-label mb-1 small">Status</label>
+            <select class="form-select form-select-sm" [(ngModel)]="filters.status" (change)="onFilterChange()">
+              <option value="">All Status</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="live">Live</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
           </div>
-          <div class="modal-body">
-            <form [formGroup]="webinarForm">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Title <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" formControlName="title" placeholder="Enter webinar title">
-                  <div *ngIf="webinarForm.get('title')?.touched && webinarForm.get('title')?.invalid" class="invalid-feedback">
-                    {{ webinarForm.get('title')?.hasError('required') ? 'Title is required' : 'Title must be 3-200 characters' }}
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Host ID <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" formControlName="host" readonly>
-                  <div *ngIf="webinarForm.get('host')?.touched && webinarForm.get('host')?.invalid" class="invalid-feedback">
-                    Host ID is required
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Host Name</label>
-                  <input type="text" class="form-control" formControlName="hostName" readonly>
-                  <div *ngIf="webinarForm.get('hostName')?.touched && webinarForm.get('hostName')?.invalid" class="invalid-feedback">
-                    Host name cannot exceed 100 characters
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Date <span class="text-danger">*</span></label>
-                  <input type="date" class="form-control" formControlName="date">
-                  <div *ngIf="webinarForm.get('date')?.touched && webinarForm.get('date')?.invalid" class="invalid-feedback">
-                    Date is required
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Start Time <span class="text-danger">*</span></label>
-                  <input type="time" class="form-control" formControlName="startTime">
-                  <div *ngIf="webinarForm.get('startTime')?.touched && webinarForm.get('startTime')?.invalid" class="invalid-feedback">
-                    Start time is required
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">End Time <span class="text-danger">*</span></label>
-                  <input type="time" class="form-control" formControlName="endTime">
-                  <div *ngIf="webinarForm.get('endTime')?.touched && webinarForm.get('endTime')?.invalid" class="invalid-feedback">
-                    End time is required
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Zoom Link <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" formControlName="zoomLink" placeholder="Enter Zoom link">
-                  <div *ngIf="webinarForm.get('zoomLink')?.touched && webinarForm.get('zoomLink')?.invalid" class="invalid-feedback">
-                    {{ webinarForm.get('zoomLink')?.hasError('required') ? 'Zoom link is required' : 'Invalid URL format' }}
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Access Type <span class="text-danger">*</span></label>
-                  <select
-                    formControlName="accessType"
-                    class="form-control"
-                    [class.is-invalid]="webinarForm.get('accessType')?.touched && webinarForm.get('accessType')?.invalid">
-                    <option value="free">Free</option>
-                    <option value="paid">Paid</option>
-                  </select>
-                  <div *ngIf="webinarForm.get('accessType')?.touched && webinarForm.get('accessType')?.invalid" class="invalid-feedback">
-                    Access type is required
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Price</label>
-                  <input type="number" class="form-control" formControlName="price" placeholder="Enter price">
-                  <div *ngIf="webinarForm.get('price')?.touched && webinarForm.get('price')?.invalid" class="invalid-feedback">
-                    {{ webinarForm.get('price')?.hasError('required') ? 'Price is required for paid webinars' : 'Price cannot be negative' }}
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Category</label>
-                  <input type="text" class="form-control" formControlName="category" placeholder="Enter category">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Description</label>
-                  <textarea class="form-control" formControlName="description" placeholder="Enter description" rows="3"></textarea>
-                  <div *ngIf="webinarForm.get('description')?.touched && webinarForm.get('description')?.invalid" class="invalid-feedback">
-                    Description cannot exceed 1000 characters
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Topic</label>
-                  <input type="text" class="form-control" formControlName="topic" placeholder="Enter topic">
-                  <div *ngIf="webinarForm.get('topic')?.touched && webinarForm.get('topic')?.invalid" class="invalid-feedback">
-                    Topic cannot exceed 100 characters
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Thumbnail</label>
-                  <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*">
-                </div>
-              </div>
-            </form>
+
+          <!-- Access Type Filter -->
+          <div style="min-width: 150px;">
+            <label class="form-label mb-1 small">Access Type</label>
+            <select class="form-select form-select-sm" [(ngModel)]="filters.accessType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option value="free">Free</option>
+              <option value="paid">Paid</option>
+            </select>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeWebinarModal()" [disabled]="modalLoading">Close</button>
-            <button type="button" class="btn btn-primary" (click)="submitWebinar()" [disabled]="modalLoading || webinarForm.invalid">
-              <span *ngIf="modalLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ editMode ? 'Update Webinar' : 'Save Webinar' }}
+
+          <!-- Mode Type Filter -->
+          <div style="min-width: 150px;">
+            <label class="form-label mb-1 small">Mode</label>
+            <select class="form-select form-select-sm" [(ngModel)]="filters.modeType" (change)="onFilterChange()">
+              <option value="">All Modes</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+
+          <!-- Search -->
+          <div style="min-width: 250px;">
+            <label class="form-label mb-1 small">Search</label>
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              [(ngModel)]="filters.search"
+              (input)="onFilterChange()"
+              placeholder="Search by title, topic...">
+          </div>
+
+          <!-- Reset Button -->
+          <div>
+            <button class="btn btn-sm btn-outline-secondary" (click)="resetFilters()">
+              <i class="bi bi-x-circle me-1"></i>Reset
             </button>
-            <!-- Debug info -->
-            <div *ngIf="formSubmitted && webinarForm.invalid" class="text-danger small mt-2">
-              Form is invalid. Please check the fields above for errors.
-            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div *ngIf="loading" class="text-center my-5 py-5">
-      <div class="spinner-grow text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <!-- Items Per Page -->
+        <div class="ms-auto">
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="filters.limit"
+            (change)="onFilterChange()"
+            style="min-width: 120px;">
+            <option value="10">10 per page</option>
+            <option value="25">25 per page</option>
+            <option value="50">50 per page</option>
+            <option value="100">100 per page</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="table-responsive" *ngIf="!loading && webinars.docs && webinars.docs.length > 0">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
-          <tr>
-            <th class="py-3">Sr No</th>
-            <th class="py-3">Title</th>
-            <th class="py-3">Host</th>
-            <th class="py-3">Date</th>
-            <th class="py-3">Time</th>
-            <th class="py-3">Access Type</th>
-            <th class="py-3">Price</th>
-            <th class="py-3">Registrations</th>
-            <th class="py-3">Status</th>
-            <th class="py-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <ng-container *ngFor="let webinar of webinars.docs | paginate: { id: paginationConfig.id, itemsPerPage: webinars.limit, currentPage: webinars.page, totalItems: webinars.totalDocs }; let i = index">
-            <tr *ngIf="webinar && webinar._id && webinar.title" class="border-bottom">
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="text-center my-5 py-5">
+        <div class="spinner-grow text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading webinars...</p>
+      </div>
+
+      <!-- Webinars Table -->
+      <div class="table-responsive" *ngIf="!loading && webinars.docs && webinars.docs.length > 0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3">Sr No</th>
+              <th class="py-3">Title</th>
+              <th class="py-3">Host</th>
+              <th class="py-3">Date & Time</th>
+              <th class="py-3">Mode</th>
+              <th class="py-3">Access</th>
+              <th class="py-3">Price</th>
+              <th class="py-3">Capacity</th>
+              <th class="py-3">Registrations</th>
+              <th class="py-3">Status</th>
+              <th class="py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let webinar of webinars.docs | paginate: { 
+              id: paginationConfig.id, 
+              itemsPerPage: webinars.limit, 
+              currentPage: webinars.page, 
+              totalItems: webinars.totalDocs 
+            }; let i = index" class="border-bottom">
               <td class="py-3">{{ (webinars.page - 1) * webinars.limit + i + 1 }}</td>
-              <td class="py-3">{{ webinar.title }}</td>
-              <td class="py-3">{{ webinar.hostName || 'N/A' }}</td>
-              <td class="py-3">{{ formatDate(webinar.date) }}</td>
-              <td class="py-3">{{ webinar.startTime }} - {{ webinar.endTime }}</td>
+              <td class="py-3">
+                <div class="fw-bold">{{ webinar.title }}</div>
+                <small class="text-muted">{{ webinar.topic }}</small>
+              </td>
+              <td class="py-3">
+                <div>{{ webinar.host?.name || 'N/A' }}</div>
+                <small class="text-muted">{{ webinar.host?.email }}</small>
+              </td>
+              <td class="py-3">
+                <div>{{ formatDate(webinar.date) }}</div>
+                <small class="text-muted">{{ webinar.startTime }} - {{ webinar.endTime }}</small>
+              </td>
+              <td class="py-3">
+                <span class="badge" [ngClass]="webinar.modeType === 'online' ? 'bg-info' : 'bg-warning'">
+                  <i [class]="webinar.modeType === 'online' ? 'bi bi-laptop' : 'bi bi-geo-alt'"></i>
+                  {{ webinar.modeType | titlecase }}
+                </span>
+              </td>
               <td class="py-3">
                 <span class="badge" [ngClass]="webinar.accessType === 'paid' ? 'bg-success' : 'bg-primary'">
                   {{ webinar.accessType | titlecase }}
                 </span>
               </td>
-              <td class="py-3">{{ webinar.price || 'N/A' }}</td>
-              <td class="py-3">{{ webinar.registeredUsers.length || 0 }}</td>
+              <td class="py-3">
+                <span *ngIf="webinar.accessType === 'paid'" class="fw-bold text-success">
+                  ₹{{ webinar.price }}
+                </span>
+                <span *ngIf="webinar.accessType === 'free'" class="text-muted">Free</span>
+              </td>
+              <td class="py-3">{{ webinar.maxCapacity }}</td>
+              <td class="py-3">
+                <button 
+                  class="btn btn-sm btn-outline-info" 
+                  (click)="viewRegisteredUsers(webinar._id)"
+                  [disabled]="!webinar.totalRegistrations || webinar.totalRegistrations === 0">
+                  <i class="bi bi-people me-1"></i>
+                  {{ webinar.totalRegistrations || 0 }}
+                </button>
+              </td>
               <td class="py-3">
                 <span class="badge" [ngClass]="{
                   'bg-success': webinar.status === 'live',
@@ -240,48 +166,622 @@
                 </span>
               </td>
               <td class="py-3">
-                <button class="btn btn-sm btn-outline-primary me-2" (click)="viewWebinarDetails(webinar._id)">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-warning me-2" (click)="openWebinarModal(webinar)" [disabled]="webinar.status === 'live'">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteWebinar(webinar._id)" [disabled]="webinar.status === 'live'">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div class="btn-group" role="group">
+                  <button 
+                    class="btn btn-sm btn-outline-primary" 
+                    (click)="openWebinarModal(webinar)"
+                    title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-outline-info" 
+                    (click)="viewVideoRequests(webinar._id)"
+                    title="Video Requests">
+                    <i class="bi bi-camera-video"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-outline-success" 
+                    (click)="openUploadVideoModal(webinar._id)"
+                    title="Upload Video">
+                    <i class="bi bi-upload"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-outline-danger" 
+                    (click)="deleteWebinar(webinar._id)"
+                    title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
-          </ng-container>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
 
-      <!-- Pagination Controls -->
-      <div class="d-flex justify-content-between align-items-center p-3 border-top">
-        <div *ngIf="webinars.docs && webinars.docs.length > 0" class="text-muted">
-          Showing {{ (webinars.page - 1) * webinars.limit + 1 }} to
-          {{ Math.min(webinars.page * webinars.limit, webinars.totalDocs) }}
-          of {{ webinars.totalDocs }} entries
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+          <div class="text-muted small">
+            Showing {{ (webinars.page - 1) * webinars.limit + 1 }} to
+            {{ Math.min(webinars.page * webinars.limit, webinars.totalDocs) }}
+            of {{ webinars.totalDocs }} entries
+          </div>
+          <pagination-controls
+            [id]="paginationConfig.id"
+            [maxSize]="5"
+            [responsive]="true"
+            (pageChange)="onPageChange($event)"
+            previousLabel="Previous"
+            nextLabel="Next">
+          </pagination-controls>
         </div>
-        <pagination-controls
-          [id]="paginationConfig.id"
-          [maxSize]="5"
-          [responsive]="true"
-          (pageChange)="onPageChange($event)"
-          previousLabel="Previous"
-          nextLabel="Next"
-          [directionLinks]="true">
-        </pagination-controls>
+      </div>
+
+      <!-- No Webinars Found -->
+      <div *ngIf="!loading && (!webinars.docs || webinars.docs.length === 0)" class="text-center my-5 py-5">
+        <i class="bi bi-camera-video-off display-1 text-muted"></i>
+        <h5 class="mt-3">No Webinars Found</h5>
+        <p class="text-muted">Try adjusting your filters or create a new webinar.</p>
+        <button class="btn btn-primary mt-3" (click)="openWebinarModal()">
+          <i class="bi bi-plus-circle me-2"></i>Add New Webinar
+        </button>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- No Webinars Found -->
-    <div *ngIf="!loading && (!webinars.docs || webinars.docs.length === 0)" class="text-center my-5 py-4 px-4">
-      <div class="empty-state">
-        <i class="bi bi-camera-video fs-1 text-muted mb-3"></i>
-        <h5>No Webinars Found</h5>
-        <p class="text-muted">Try adjusting your filter criteria or date range.</p>
-        <button class="btn btn-outline-primary rounded-pill mt-3" (click)="resetFilters()">
-          <i class="bi bi-arrow-repeat me-2"></i>Reset Filters
+<!-- Add/Edit Webinar Modal -->
+<div *ngIf="showWebinarModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-camera-video me-2"></i>
+          {{ editMode ? 'Edit Webinar' : 'Add New Webinar' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeWebinarModal()" [disabled]="modalLoading"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="webinarForm">
+          <div class="row">
+            <!-- Title -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="title" 
+                placeholder="Enter webinar title"
+                [class.is-invalid]="webinarForm.get('title')?.touched && webinarForm.get('title')?.invalid">
+              <div *ngIf="webinarForm.get('title')?.touched && webinarForm.get('title')?.invalid" class="invalid-feedback d-block">
+                <span *ngIf="webinarForm.get('title')?.hasError('required')">Title is required</span>
+                <span *ngIf="webinarForm.get('title')?.hasError('minlength')">Title must be at least 3 characters</span>
+                <span *ngIf="webinarForm.get('title')?.hasError('maxlength')">Title cannot exceed 200 characters</span>
+              </div>
+            </div>
+
+            <!-- Topic -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Topic</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="topic" 
+                placeholder="Enter topic"
+                [class.is-invalid]="webinarForm.get('topic')?.touched && webinarForm.get('topic')?.invalid">
+              <div *ngIf="webinarForm.get('topic')?.touched && webinarForm.get('topic')?.invalid" class="invalid-feedback d-block">
+                Topic cannot exceed 100 characters
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12 mb-3">
+              <label class="form-label">Description</label>
+              <textarea 
+                class="form-control" 
+                formControlName="description" 
+                placeholder="Enter description" 
+                rows="3"
+                [class.is-invalid]="webinarForm.get('description')?.touched && webinarForm.get('description')?.invalid"></textarea>
+              <div *ngIf="webinarForm.get('description')?.touched && webinarForm.get('description')?.invalid" class="invalid-feedback d-block">
+                Description cannot exceed 1000 characters
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Date <span class="text-danger">*</span></label>
+              <input 
+                type="date" 
+                class="form-control" 
+                formControlName="date"
+                [class.is-invalid]="webinarForm.get('date')?.touched && webinarForm.get('date')?.invalid">
+              <div *ngIf="webinarForm.get('date')?.touched && webinarForm.get('date')?.invalid" class="invalid-feedback d-block">
+                Date is required
+              </div>
+            </div>
+
+            <!-- Start Time -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Start Time <span class="text-danger">*</span></label>
+              <input 
+                type="time" 
+                class="form-control" 
+                formControlName="startTime"
+                [class.is-invalid]="webinarForm.get('startTime')?.touched && webinarForm.get('startTime')?.invalid">
+              <div *ngIf="webinarForm.get('startTime')?.touched && webinarForm.get('startTime')?.invalid" class="invalid-feedback d-block">
+                Start time is required
+              </div>
+            </div>
+
+            <!-- End Time -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">End Time <span class="text-danger">*</span></label>
+              <input 
+                type="time" 
+                class="form-control" 
+                formControlName="endTime"
+                [class.is-invalid]="webinarForm.get('endTime')?.touched && webinarForm.get('endTime')?.invalid">
+              <div *ngIf="webinarForm.get('endTime')?.touched && webinarForm.get('endTime')?.invalid" class="invalid-feedback d-block">
+                End time is required
+              </div>
+            </div>
+
+            <!-- Mode Type -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Mode Type <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="modeType"
+                [class.is-invalid]="webinarForm.get('modeType')?.touched && webinarForm.get('modeType')?.invalid">
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+              </select>
+            </div>
+
+            <!-- Access Type -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Access Type <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="accessType"
+                [class.is-invalid]="webinarForm.get('accessType')?.touched && webinarForm.get('accessType')?.invalid">
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </select>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Status</label>
+              <select class="form-select" formControlName="status">
+                <option value="scheduled">Scheduled</option>
+                <option value="live">Live</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <!-- Online Mode Fields -->
+            <ng-container *ngIf="webinarForm.get('modeType')?.value === 'online'">
+              <!-- Zoom Link -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Zoom Link <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="zoomLink" 
+                  placeholder="Enter Zoom link"
+                  [class.is-invalid]="webinarForm.get('zoomLink')?.touched && webinarForm.get('zoomLink')?.invalid">
+                <div *ngIf="webinarForm.get('zoomLink')?.touched && webinarForm.get('zoomLink')?.invalid" class="invalid-feedback d-block">
+                  Zoom link is required for online webinars
+                </div>
+              </div>
+
+              <!-- Zoom Meeting ID -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Meeting ID</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="zoomMeetingId" 
+                  placeholder="Meeting ID">
+              </div>
+
+              <!-- Zoom Passcode -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Passcode</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="zoomPasscode" 
+                  placeholder="Passcode">
+              </div>
+            </ng-container>
+
+            <!-- Offline Mode Fields -->
+            <ng-container *ngIf="webinarForm.get('modeType')?.value === 'offline'">
+              <!-- Address -->
+              <div class="col-md-8 mb-3">
+                <label class="form-label">Address <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="address" 
+                  placeholder="Enter venue address"
+                  [class.is-invalid]="webinarForm.get('address')?.touched && webinarForm.get('address')?.invalid">
+                <div *ngIf="webinarForm.get('address')?.touched && webinarForm.get('address')?.invalid" class="invalid-feedback d-block">
+                  Address is required for offline webinars
+                </div>
+              </div>
+
+              <!-- Map Link -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Map Link</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="mapLink" 
+                  placeholder="Google Maps link">
+              </div>
+            </ng-container>
+
+            <!-- Price (shown only for paid webinars) -->
+            <div class="col-md-6 mb-3" *ngIf="webinarForm.get('accessType')?.value === 'paid'">
+              <label class="form-label">Price <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="price" 
+                  placeholder="Enter price"
+                  [class.is-invalid]="webinarForm.get('price')?.touched && webinarForm.get('price')?.invalid">
+              </div>
+              <div *ngIf="webinarForm.get('price')?.touched && webinarForm.get('price')?.invalid" class="invalid-feedback d-block">
+                <span *ngIf="webinarForm.get('price')?.hasError('required')">Price is required for paid webinars</span>
+                <span *ngIf="webinarForm.get('price')?.hasError('min')">Price must be at least ₹1</span>
+              </div>
+            </div>
+
+            <!-- Max Capacity -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Max Capacity <span class="text-danger">*</span></label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="maxCapacity" 
+                placeholder="Enter maximum capacity"
+                [class.is-invalid]="webinarForm.get('maxCapacity')?.touched && webinarForm.get('maxCapacity')?.invalid">
+              <div *ngIf="webinarForm.get('maxCapacity')?.touched && webinarForm.get('maxCapacity')?.invalid" class="invalid-feedback d-block">
+                <span *ngIf="webinarForm.get('maxCapacity')?.hasError('required')">Max capacity is required</span>
+                <span *ngIf="webinarForm.get('maxCapacity')?.hasError('min')">Max capacity must be at least 1</span>
+              </div>
+            </div>
+
+            <!-- Thumbnail Upload with Preview -->
+            <div class="col-12 mb-3">
+              <label class="form-label">Thumbnail Image</label>
+              
+              <!-- Thumbnail Preview -->
+              <div *ngIf="previewThumbnail" class="mb-3">
+                <div class="position-relative d-inline-block">
+                  <img 
+                    [src]="environment.imageUrl + previewThumbnail" 
+                    alt="Thumbnail Preview" 
+                    class="img-thumbnail rounded"
+                    style="max-width: 300px; max-height: 200px; object-fit: cover;">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                    (click)="removeThumbnail()"
+                    title="Remove Thumbnail">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+                <div class="mt-2">
+                  <small class="text-muted">
+                    <i class="bi bi-check-circle text-success me-1"></i>
+                    {{ editMode ? 'Current thumbnail' : 'Selected thumbnail' }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- File Input -->
+              <input 
+                id="thumbnailInput"
+                type="file" 
+                class="form-control" 
+                (change)="onFileChange($event)" 
+                accept="image/*">
+              <small class="text-muted d-block mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Upload a thumbnail image for the webinar (JPG, PNG, max 5MB)
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeWebinarModal()" [disabled]="modalLoading">
+          <i class="bi bi-x-circle me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitWebinar()" [disabled]="modalLoading || webinarForm.invalid">
+          <span *ngIf="modalLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!modalLoading" class="bi bi-save me-2"></i>
+          {{ editMode ? 'Update Webinar' : 'Create Webinar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Registered Users Modal -->
+<div *ngIf="showRegistrationsModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-people me-2"></i>
+          Registered Users
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeRegistrationsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Filter -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label small">Filter by Status</label>
+            <select class="form-select form-select-sm" [(ngModel)]="registrationFilters.approvalStatus" (change)="onRegistrationFilterChange()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Items Per Page</label>
+            <select class="form-select form-select-sm" [(ngModel)]="registrationFilters.limit" (change)="onRegistrationFilterChange()">
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="50">50 per page</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="modalLoading" class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-3 text-muted">Loading registrations...</p>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="!modalLoading && registrations.docs && registrations.docs.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Sr No</th>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Registered At</th>
+                <th>Payment Status</th>
+                <th>Approval Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let reg of registrations.docs | paginate: {
+                id: registrationPaginationConfig.id,
+                itemsPerPage: registrations.limit,
+                currentPage: registrations.page,
+                totalItems: registrations.totalDocs
+              }; let i = index">
+                <td>{{ (registrations.page - 1) * registrations.limit + i + 1 }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img [src]="environment.imageUrl + reg.userId.profilePic || 'assets/default-avatar.png'" 
+                         alt="User" 
+                         class="rounded-circle me-2" 
+                         style="width: 40px; height: 40px; object-fit: cover;">
+                    <div>
+                      <div class="fw-bold">{{ reg.userId.name }}</div>
+                      <small class="text-muted">{{ reg.userId.email }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ reg.userId.mobile_number || 'N/A' }}</td>
+                <td>{{ formatDate(reg.registeredAt) }}</td>
+                <td>
+                  <span class="badge" [ngClass]="reg.hasPaid ? 'bg-success' : 'bg-warning'">
+                    {{ reg.hasPaid ? 'Paid' : 'Unpaid' }}
+                  </span>
+                  <div *ngIf="reg.hasPaid" class="small text-muted">₹{{ reg.amount }}</div>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': reg.approvalStatus === 'pending',
+                    'bg-success': reg.approvalStatus === 'approved',
+                    'bg-danger': reg.approvalStatus === 'rejected'
+                  }">
+                    {{ reg.approvalStatus | titlecase }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group" role="group" *ngIf="reg.approvalStatus === 'pending'">
+                    <button 
+                      class="btn btn-sm btn-success" 
+                      (click)="approveRegistration(reg._id, 'approve')"
+                      title="Approve">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger" 
+                      (click)="approveRegistration(reg._id, 'reject')"
+                      title="Reject">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                  <span *ngIf="reg.approvalStatus !== 'pending'" class="text-muted small">
+                    {{ reg.approvalStatus === 'approved' ? 'Approved' : 'Rejected' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted small">
+              Showing {{ (registrations.page - 1) * registrations.limit + 1 }} to
+              {{ Math.min(registrations.page * registrations.limit, registrations.totalDocs) }}
+              of {{ registrations.totalDocs }} entries
+            </div>
+            <pagination-controls
+              [id]="registrationPaginationConfig.id"
+              [maxSize]="5"
+              (pageChange)="onRegistrationPageChange($event)">
+            </pagination-controls>
+          </div>
+        </div>
+
+        <!-- No Registrations -->
+        <div *ngIf="!modalLoading && (!registrations.docs || registrations.docs.length === 0)" class="text-center py-5">
+          <i class="bi bi-people display-3 text-muted"></i>
+          <p class="mt-3 text-muted">No registrations found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Video Requests Modal -->
+<div *ngIf="showVideoRequestsModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">
+          <i class="bi bi-camera-video me-2"></i>
+          Video Requests - {{ videoRequests.webinarTitle }}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeVideoRequestsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Filter -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label small">Filter by Status</label>
+            <select class="form-select form-select-sm" [(ngModel)]="videoRequestFilters.status" (change)="onVideoRequestFilterChange()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="modalLoading" class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-3 text-muted">Loading video requests...</p>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="!modalLoading && videoRequests.videoRequests && videoRequests.videoRequests.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Sr No</th>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Note</th>
+                <th>Requested At</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of videoRequests.videoRequests; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>
+                  <div>
+                    <div class="fw-bold">{{ request.userId.name }}</div>
+                    <small class="text-muted">{{ request.userId.email }}</small>
+                  </div>
+                </td>
+                <td>{{ request.userId.mobile_number || 'N/A' }}</td>
+                <td>{{ request.note || 'No note' }}</td>
+                <td>{{ formatDate(request.requestedAt) }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': request.status === 'pending',
+                    'bg-success': request.status === 'approved',
+                    'bg-danger': request.status === 'rejected'
+                  }">
+                    {{ request.status | titlecase }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group" role="group" *ngIf="request.status === 'pending'">
+                    <button 
+                      class="btn btn-sm btn-success" 
+                      (click)="approveVideoRequest(request._id!, 'approve')"
+                      title="Approve">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger" 
+                      (click)="approveVideoRequest(request._id!, 'reject')"
+                      title="Reject">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                  <span *ngIf="request.status !== 'pending'" class="text-muted small">
+                    {{ request.status === 'approved' ? 'Approved' : 'Rejected' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Requests -->
+        <div *ngIf="!modalLoading && (!videoRequests.videoRequests || videoRequests.videoRequests.length === 0)" class="text-center py-5">
+          <i class="bi bi-camera-video-off display-3 text-muted"></i>
+          <p class="mt-3 text-muted">No video requests found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Video URL Modal -->
+<div *ngIf="showUploadVideoModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-upload me-2"></i>
+          Upload Video URL
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeUploadVideoModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Video URL <span class="text-danger">*</span></label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="videoUrl" 
+            placeholder="Enter video URL (YouTube, Vimeo, etc.)">
+          <small class="text-muted">Paste the URL of your webinar recording</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeUploadVideoModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="submitVideoUrl()" [disabled]="!videoUrl || modalLoading">
+          <span *ngIf="modalLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!modalLoading" class="bi bi-upload me-2"></i>
+          Upload
         </button>
       </div>
     </div>

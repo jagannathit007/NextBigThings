@@ -267,11 +267,6 @@ export class SideBarService {
         icon:'history'
       },
         {
-        title:'Webinar-Manage',
-        link:'webinar-manage',
-        icon:'history'
-      },
-        {
         title:'Goals',
         link:'goals',
         icon:'history'

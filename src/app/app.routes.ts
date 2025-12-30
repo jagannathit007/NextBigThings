@@ -51,7 +51,6 @@ import { FinanceComponent } from './views/pages/financeModule/finance.component'
 import { ExpenseComponent } from './views/pages/expense/expense.component';
 import { AnalyticsComponent } from './views/pages/analytics/analytics.component';
 import { WebinarComponent } from './views/pages/webinar/webinar.component';
-import { WebinarManageComponent } from './views/pages/webinar-manage/webinar-manage.component';
 import { GoalsComponent } from './views/pages/goals/goals.component';
 import { LTPointsComponent } from './views/pages/LT Points/ltPoints.component';
 import { ComplainComponent } from './views/pages/complain/complain.component';
@@ -125,7 +124,6 @@ export const routes: Routes = [
 {path: 'podcastBooking', component: BookingsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'expense', component: ExpenseComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'webinar', component: WebinarComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
-{path: 'webinar-manage', component: WebinarManageComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'goals', component: GoalsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'complain', component: ComplainComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'suggestion', component: SuggestionComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },

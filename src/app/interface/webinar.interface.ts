@@ -1,3 +1,5 @@
+// webinar.interface.ts
+
 export interface Webinar {
   _id: string;
   title: string;
@@ -9,71 +11,68 @@ export interface Webinar {
     email: string;
     role: string;
   };
-  hostName: string;
   date: string;
   startTime: string;
   endTime: string;
   thumbnail: string;
-  bannerImage: string;
+  modeType: 'offline' | 'online';
+  address: string;
+  mapLink: string;
   zoomLink: string;
   zoomMeetingId: string;
   zoomPasscode: string;
   accessType: 'free' | 'paid';
   price: number;
   maxCapacity: number;
-  streamingUrl: string;
-  streamingTech: 'webrtc' | 'hls';
-  registeredUsers: {
-    userId: {
-      _id: string;
-      name: string;
-      email: string;
-      mobile_number: string;
-    };
-    userType: 'entrepreneur' | 'company_employee' | 'client';
-    registeredAt: string;
-    hasPaid: boolean;
-    paymentAmount: number;
-  }[];
-  liveAttendees: {
-    userId: {
-      _id: string;
-      name: string;
-      email: string;
-    };
-    joinedAt: string;
-    leftAt: string | null;
-  }[];
-  isRecorded: boolean;
-  recordingUrl: string;
-  recordingStatus: 'not_recorded' | 'recording' | 'processing' | 'ready';
-  recordingRequests: {
-    userId: string;
-    requestedAt: string;
-    status: 'pending' | 'approved' | 'rejected';
-    approvedBy: string | null;
-    approvedAt: string | null;
-  }[];
-  attendanceQRCode: string;
-  qrCodeAttendance: {
-    userId: string;
-    scannedAt: string;
-  }[];
   status: 'scheduled' | 'live' | 'completed' | 'cancelled';
   isActive: boolean;
-  allowChat: boolean;
-  allowQA: boolean;
-  category: string;
-  postSessionFiles: {
-    fileName: string;
-    fileUrl: string;
-    fileType: string;
-  }[];
-  assignedBatch: string;
+  webinarVideoUrl: string;
+  videoRequests: VideoRequest[];
   createdAt: string;
   updatedAt: string;
-  totalRegistrations: number;
-  currentLiveCount: number;
+  totalRegistrations?: number;
+}
+
+export interface VideoRequest {
+  _id?: string;
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+    mobile_number: string;
+  };
+  note: string;
+  requestedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  approvedBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  approvedAt?: string;
+}
+
+export interface WebinarRegistration {
+  _id: string;
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+    mobile_number: string;
+    profilePic: string;
+  };
+  webinarId: string;
+  hasPaid: boolean;
+  amount: number;
+  paymentDetails: any;
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvedBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  approvedAt?: string;
+  registeredAt: string;
 }
 
 export interface WebinarResponse {
@@ -89,28 +88,17 @@ export interface WebinarResponse {
   nextPage: number | null;
 }
 
-export interface WebinarAnalytics {
-  webinarInfo: {
-    title: string;
-    date: string;
-    status: string;
-  };
-  registrations: {
-    total: number;
-    entrepreneurs: number;
-    companyEmployees: number;
-    clients: number;
-  };
-  attendance: {
-    totalAttendees: number;
-    currentlyLive: number;
-    qrScans: number;
-  };
-  recordings: {
-    isRecorded: boolean;
-    recordingRequests: number;
-    approvedRequests: number;
-  };
+export interface RegistrationResponse {
+  docs: WebinarRegistration[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage: number | null;
+  nextPage: number | null;
 }
 
 export interface CreateWebinarData {
@@ -118,23 +106,19 @@ export interface CreateWebinarData {
   description?: string;
   topic?: string;
   host: string;
-  hostName?: string;
   date: string;
   startTime: string;
   endTime: string;
-  thumbnail?: string;
-  bannerImage?: string;
-  zoomLink: string;
+  modeType: 'offline' | 'online';
+  address?: string;
+  mapLink?: string;
+  zoomLink?: string;
   zoomMeetingId?: string;
   zoomPasscode?: string;
-  accessType?: 'free' | 'paid';
+  accessType: 'free' | 'paid';
   price?: number;
-  maxCapacity?: number;
-  streamingTech?: 'webrtc' | 'hls';
-  allowChat?: boolean;
-  allowQA?: boolean;
-  category?: string;
-  assignedBatch?: string;
+  maxCapacity: number;
+  status?: 'scheduled' | 'live' | 'completed' | 'cancelled';
 }
 
 export interface UpdateWebinarData {
@@ -143,30 +127,24 @@ export interface UpdateWebinarData {
   description?: string;
   topic?: string;
   host?: string;
-  hostName?: string;
   date?: string;
   startTime?: string;
   endTime?: string;
-  thumbnail?: string;
-  bannerImage?: string;
+  modeType?: 'offline' | 'online';
+  address?: string;
+  mapLink?: string;
   zoomLink?: string;
   zoomMeetingId?: string;
   zoomPasscode?: string;
   accessType?: 'free' | 'paid';
   price?: number;
   maxCapacity?: number;
-  streamingTech?: 'webrtc' | 'hls';
-  allowChat?: boolean;
-  allowQA?: boolean;
-  category?: string;
-  assignedBatch?: string;
+  status?: 'scheduled' | 'live' | 'completed' | 'cancelled';
 }
 
-export interface StartStreamingData {
-  streamingUrl: string;
-}
-
-export interface ApproveRecordingData {
-  status: 'approved' | 'rejected';
-  adminNotes?: string;
+export interface VideoRequestsResponse {
+  webinarId: string;
+  webinarTitle: string;
+  totalRequests: number;
+  videoRequests: VideoRequest[];
 }

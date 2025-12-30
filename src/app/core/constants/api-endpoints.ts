@@ -210,12 +210,18 @@ public GET_RECENT_ACTIVITIES = `${this.PATH}/getRecentActivities`;
   public GET_WEBINAR: string = `${this.PATH}/getWebinar`;
   public UPDATE_WEBINAR: string = `${this.PATH}/updateWebinar`;
   public DELETE_WEBINAR: string = `${this.PATH}/deleteWebinar`;
+  public GET_REGISTERED_USERS: string = `${this.PATH}/getRegisteredUsers`;
+  public GET_VIDEO_REQUESTS: string = `${this.PATH}/getVideoRequests`;
+  public UPLOAD_WEBINAR_VIDEO: string = `${this.PATH}/uploadWebinarVideo`;
+  public APPROVE_REGISTRATION: string = `${this.PATH}/approveRegistration`;
+  public APPROVE_VIDEO_REQUEST: string = `${this.PATH}/approveVideoRequest`;
 
   public START_STREAMING: string = `${this.PATH}/startStreaming`;
   public END_WEBINAR: string = `${this.PATH}/endWebinar`;
   public UPLOAD_RECORDING: string = `${this.PATH}/uploadRecording`;
   public APPROVE_RECORDING: string = `${this.PATH}/approveRecording`;
   public GET_WEBINAR_ANALYTICS: string = `${this.PATH}/getAnalytics`;
+
 
 
   // golas management
