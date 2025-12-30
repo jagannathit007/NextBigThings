@@ -32,6 +32,12 @@ export class ComplainComponent implements OnInit {
   loading: boolean = false;
   showComplaintModal: boolean = false;
   selectedComplaint: Complaint | null = null;
+  
+  updateStatusData = {
+    status: '',
+    adminResponse: ''
+  };
+  isUpdating: boolean = false;
 
   // Pagination
   totalDocs: number = 0;
@@ -125,8 +131,37 @@ export class ComplainComponent implements OnInit {
 
   openComplaintModal(complaint: Complaint): void {
     this.selectedComplaint = complaint;
+    
+    this.updateStatusData = {
+      status: complaint.status || 'pending',
+      adminResponse: complaint.adminResponse || ''
+    };
+    
     this.showComplaintModal = true;
     this.cdr.detectChanges();
+  }
+
+  async updateStatus(): Promise<void> {
+    if (!this.selectedComplaint?._id) return;
+    
+    this.isUpdating = true;
+    try {
+      await this.complaintService.updateComplaintStatus(
+        this.selectedComplaint._id,
+        this.updateStatusData.status,
+        this.updateStatusData.adminResponse
+      );
+      
+      swalHelper.showToast('Status updated successfully', 'success');
+      this.closeComplaintModal();
+      this.fetchComplaints(); // Refresh list
+    } catch (error) {
+      console.error('Update failed', error);
+      // Toast handled in service
+    } finally {
+      this.isUpdating = false;
+      this.cdr.detectChanges();
+    }
   }
 
   closeComplaintModal(): void {

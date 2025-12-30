@@ -56,4 +56,25 @@ export class ComplaintService {
       throw error;
     }
   }
+
+  async updateComplaintStatus(id: string, status: string, adminResponse: string): Promise<any> {
+    try {
+      this.getHeaders();
+      const body = { status, adminResponse };
+      
+      const response = await this.apiManager.request(
+        {
+          url: `${apiEndpoints.UPDATE_COMPLAINTS}/${id}`,
+          method: 'PUT',
+        },
+        body,
+        this.headers
+      );
+      return response;
+    } catch (error) {
+      console.error('Update Complaint Status Error:', error);
+      swalHelper.showToast('Failed to update complaint status', 'error');
+      throw error;
+    }
+  }
 }

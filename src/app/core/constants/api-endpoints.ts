@@ -229,6 +229,7 @@ public GET_RECENT_ACTIVITIES = `${this.PATH}/getRecentActivities`;
 
   // Complaint Management
   public GET_ALL_COMPLAINTS: string = `${this.PATH1}/mobile/getAllComplaints`;
+  public UPDATE_COMPLAINTS: string = `${this.PATH1}/mobile/updateComplaintStatus`;
 
   // Suggestion Management
   public GET_ALL_SUGGESTIONS: string = `${this.PATH1}/mobile/getAllSuggestions`;
