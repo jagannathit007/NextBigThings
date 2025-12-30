@@ -1,350 +1,148 @@
-<div class="container-fluid">
-  <div class="row">
-    <!-- Header Section -->
-    <div class="col-12">
-      <div class="card border-0 shadow-lg rounded-4 mb-4">
-        <div class="card-header bg-gradient-primary py-3">
-          <div class="row align-items-center">
-            <div class="col-md-8">
-              <h4 class="mb-0 fw-bold text-white">
-                <i class="bi bi-graph-up me-2"></i>
-                Analytics Dashboard
-              </h4>
-              <p class="mb-0 text-white-50">Real-time insights and metrics</p>
-            </div>
-            <div class="col-md-4 text-end">
-              <div class="d-flex align-items-center justify-content-end gap-2">
-                <select
-                  class="form-select form-select-sm"
-                  [(ngModel)]="selectedDays"
-                  (change)="onDaysChange()"
-                  style="width: auto;">
-                  <option value="7">Last 7 days</option>
-                  <option value="30">Last 30 days</option>
-                  <option value="90">Last 90 days</option>
-                </select>
-                <button class="btn btn-sm btn-light" (click)="refreshData()" [disabled]="loading">
-                  <i class="bi bi-arrow-repeat"></i>
-                </button>
-              </div>
+<div class="analytics-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h2><i class="bi bi-bar-chart-line"></i> Analytics Dashboard</h2>
+      <p>Overview of your platform statistics</p>
+    </div>
+    <div class="header-right">
+      <input type="date" [(ngModel)]="startDate" (change)="onDateChange()" class="date-input" placeholder="Start Date">
+      <input type="date" [(ngModel)]="endDate" (change)="onDateChange()" class="date-input" placeholder="End Date">
+      <button *ngIf="startDate || endDate" (click)="clearDates()" class="btn-icon" title="Clear">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <button (click)="refreshData()" [disabled]="loading" class="btn-icon" title="Refresh">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading" class="content">
+    
+    <!-- Stats Cards -->
+    <div class="stats-row">
+      
+      <!-- Users -->
+      <div class="stat-card blue">
+        <div class="stat-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ analytics.totalUsers }}</h3>
+          <p>Total Users</p>
+          <span class="stat-badge">+{{ analytics.newUsers }} new</span>
+        </div>
+      </div>
+
+      <!-- Webinars -->
+      <div class="stat-card green">
+        <div class="stat-icon">
+          <i class="bi bi-camera-video-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ analytics.totalWebinars }}</h3>
+          <p>Total Webinars</p>
+          <span class="stat-badge">+{{ analytics.newWebinars }} new</span>
+        </div>
+      </div>
+
+      <!-- Events -->
+      <div class="stat-card orange">
+        <div class="stat-icon">
+          <i class="bi bi-calendar-event-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ analytics.totalEvents }}</h3>
+          <p>Total Events</p>
+          <span class="stat-badge">+{{ analytics.newEvents }} new</span>
+        </div>
+      </div>
+
+      <!-- Registrations -->
+      <div class="stat-card purple">
+        <div class="stat-icon">
+          <i class="bi bi-person-check-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ analytics.totalRegistrations }}</h3>
+          <p>Total Registrations</p>
+          <span class="stat-badge">+{{ analytics.newRegistrations }} new</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <div class="section-header">
+        <h3><i class="bi bi-bar-chart-fill"></i> Registrations per Webinar</h3>
+      </div>
+      
+      <div *ngIf="analytics.registrationsPerWebinar.length === 0" class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>No data available</p>
+      </div>
+
+      <div *ngIf="analytics.registrationsPerWebinar.length > 0" class="chart-container">
+        <div *ngFor="let item of analytics.registrationsPerWebinar" class="chart-bar">
+          <div class="bar-label">{{ item.webinarTitle }}</div>
+          <div class="bar-wrapper">
+            <div class="bar-fill" [style.width.%]="getBarWidth(item.registrationCount)">
+              <span class="bar-count">{{ item.registrationCount }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="col-12 mb-4">
-      <div class="row">
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-people fs-1 text-primary mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.totalUsers }}</h3>
-              <p class="text-muted mb-0">Total Users</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-camera-video fs-1 text-success mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.totalWebinars }}</h3>
-              <p class="text-muted mb-0">Total Webinars</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-calendar-event fs-1 text-info mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.totalEvents }}</h3>
-              <p class="text-muted mb-0">Total Events</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-person-check fs-1 text-warning mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.totalRegistrations }}</h3>
-              <p class="text-muted mb-0">Registrations</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-broadcast fs-1 text-danger mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.activeWebinars }}</h3>
-              <p class="text-muted mb-0">Live Now</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-          <div class="card stat-card border-0 h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-calendar-plus fs-1 text-purple mb-3"></i>
-              <h3 class="fw-bold mb-1">{{ analytics.summary.upcomingEvents }}</h3>
-              <p class="text-muted mb-0">Upcoming</p>
-            </div>
-          </div>
-        </div>
+    <!-- Table Section -->
+    <div class="table-section">
+      <div class="section-header">
+        <h3><i class="bi bi-table"></i> Detailed View</h3>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (input)="filterWebinars()" 
+          placeholder="Search webinars..."
+          class="search-input">
       </div>
-    </div>
 
-    <!-- Charts Section -->
-    <!-- <div class="col-lg-8 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <div class="row align-items-center">
-            <div class="col-md-8">
-              <h5 class="mb-0 fw-bold">{{ getChartTitle() }} Trends</h5>
-            </div>
-            <div class="col-md-4 text-end">
-              <select
-                class="form-select form-select-sm"
-                [(ngModel)]="selectedChartType"
-                (change)="onChartTypeChange()"
-                style="width: auto;">
-                <option value="users">Users</option>
-                <option value="webinars">Webinars</option>
-                <option value="events">Events</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div *ngIf="chartLoading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </div>
-          <div *ngIf="!chartLoading" class="chart-container">
-            <div class="row">
-              <div class="col-12">
-                <p class="text-muted mb-3">
-                  Total {{ selectedChartType }}: 
-                  <strong>{{ getCurrentChartData().total }}</strong>
-                </p>
-              </div>
-              <div class="col-12">
-                <div class="chart-placeholder text-center py-5 bg-light rounded">
-                  <i class="bi bi-bar-chart fs-1 text-muted mb-3"></i>
-                  <p class="text-muted">Chart data: {{ getCurrentChartData().labels.length }} data points</p>
-                  <small class="text-muted">Chart integration can be added with Chart.js or similar library</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div *ngIf="filteredWebinars.length === 0" class="empty-state">
+        <i class="bi bi-search"></i>
+        <p>No results found</p>
       </div>
-    </div> -->
 
-    <!-- Recent Activities -->
-    <div class="col-lg-4 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <h5 class="mb-0 fw-bold">Recent Activities</h5>
-        </div>
-        <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
-          <div *ngIf="activitiesLoading" class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </div>
-          <div *ngIf="!activitiesLoading && recentActivities.length > 0">
-            <div *ngFor="let activity of recentActivities" class="activity-item p-3 border-bottom">
-              <div class="d-flex align-items-start">
-                <div class="activity-icon me-3">
-                  <i [class]="activity.icon" class="text-primary fs-5"></i>
-                </div>
-                <div class="flex-grow-1">
-                  <h6 class="mb-1">{{ activity.action }}</h6>
-                  <p class="mb-1 text-muted small">{{ activity.details }}</p>
-                  <small class="text-muted">{{ formatDate(activity.timestamp) }}</small>
-                </div>
+      <table *ngIf="filteredWebinars.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Webinar Title</th>
+            <th class="text-center">Registrations</th>
+            <th class="text-center">Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredWebinars; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td><i class="bi bi-camera-video text-muted"></i> {{ item.webinarTitle }}</td>
+            <td class="text-center">
+              <span class="count-badge">{{ item.registrationCount }}</span>
+            </td>
+            <td class="text-center">
+              <div class="progress-mini">
+                <div class="progress-fill-mini" [style.width.%]="getBarWidth(item.registrationCount)"></div>
               </div>
-            </div>
-          </div>
-          <div *ngIf="!activitiesLoading && recentActivities.length === 0" class="text-center py-4">
-            <i class="bi bi-activity fs-3 text-muted mb-2"></i>
-            <p class="text-muted mb-0">No recent activities</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- User Metrics -->
-    <div class="col-lg-6 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <h5 class="mb-0 fw-bold">User Metrics</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-6 mb-3">
-              <div class="metric-item">
-                <h4 class="text-primary fw-bold">{{ analytics.userMetrics.newToday }}</h4>
-                <p class="text-muted mb-0">New Today</p>
-              </div>
-            </div>
-            <div class="col-6 mb-3">
-              <div class="metric-item">
-                <h4 class="text-success fw-bold">{{ analytics.userMetrics.newThisMonth }}</h4>
-                <p class="text-muted mb-0">This Month</p>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="progress-item mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                  <span class="text-muted">Verified Users</span>
-                  <span class="text-muted">{{ getProgressPercentage(analytics.userMetrics.verified, analytics.userMetrics.total) }}%</span>
-                </div>
-                <div class="progress">
-                  <div class="progress-bar bg-success" 
-                       [style.width.%]="getProgressPercentage(analytics.userMetrics.verified, analytics.userMetrics.total)">
-                  </div>
-                </div>
-                <small class="text-muted">{{ analytics.userMetrics.verified }} of {{ analytics.userMetrics.total }} users</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Webinar Metrics -->
-    <div class="col-lg-6 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <h5 class="mb-0 fw-bold">Webinar Metrics</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-4 mb-3">
-              <div class="metric-item text-center">
-                <h5 class="text-warning fw-bold">{{ analytics.webinarMetrics.scheduled }}</h5>
-                <small class="text-muted">Scheduled</small>
-              </div>
-            </div>
-            <div class="col-4 mb-3">
-              <div class="metric-item text-center">
-                <h5 class="text-danger fw-bold">{{ analytics.webinarMetrics.live }}</h5>
-                <small class="text-muted">Live</small>
-              </div>
-            </div>
-            <div class="col-4 mb-3">
-              <div class="metric-item text-center">
-                <h5 class="text-info fw-bold">{{ analytics.webinarMetrics.completed }}</h5>
-                <small class="text-muted">Completed</small>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="d-flex justify-content-between">
-                <div class="text-center">
-                  <h6 class="text-primary">{{ analytics.webinarMetrics.free }}</h6>
-                  <small class="text-muted">Free</small>
-                </div>
-                <div class="text-center">
-                  <h6 class="text-success">{{ analytics.webinarMetrics.paid }}</h6>
-                  <small class="text-muted">Paid</small>
-                </div>
-                <div class="text-center">
-                  <h6 class="text-warning">{{ analytics.webinarMetrics.totalRegistrations }}</h6>
-                  <small class="text-muted">Total Registrations</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Event Metrics -->
-    <div class="col-lg-6 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <h5 class="mb-0 fw-bold">Event Metrics</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-6 mb-3">
-              <div class="metric-item">
-                <h5 class="text-success fw-bold">{{ analytics.eventMetrics.upcoming }}</h5>
-                <p class="text-muted mb-0">Upcoming</p>
-              </div>
-            </div>
-            <div class="col-6 mb-3">
-              <div class="metric-item">
-                <h5 class="text-secondary fw-bold">{{ analytics.eventMetrics.past }}</h5>
-                <p class="text-muted mb-0">Past</p>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="row">
-                <div class="col-6">
-                  <small class="text-muted">By Type:</small>
-                  <div class="d-flex justify-content-between">
-                    <span>Events: {{ analytics.eventMetrics.byType.event }}</span>
-                    <span>Meetings: {{ analytics.eventMetrics.byType.meeting }}</span>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <small class="text-muted">By Mode:</small>
-                  <div class="d-flex justify-content-between">
-                    <span>Online: {{ analytics.eventMetrics.byMode.online }}</span>
-                    <span>Offline: {{ analytics.eventMetrics.byMode.offline }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feedback Metrics -->
-    <div class="col-lg-6 mb-4">
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-header bg-light border-0">
-          <h5 class="mb-0 fw-bold">Feedback Metrics</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-6">
-              <h6 class="text-muted mb-2">Complaints</h6>
-              <div class="mb-2">
-                <span class="badge bg-warning me-2">{{ analytics.feedbackMetrics.complaints.pending }}</span>
-                <small>Pending</small>
-              </div>
-              <div class="mb-2">
-                <span class="badge bg-success me-2">{{ analytics.feedbackMetrics.complaints.resolved }}</span>
-                <small>Resolved</small>
-              </div>
-              <div>
-                <span class="badge bg-secondary me-2">{{ analytics.feedbackMetrics.complaints.total }}</span>
-                <small>Total</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <h6 class="text-muted mb-2">Suggestions</h6>
-              <div class="mb-2">
-                <span class="badge bg-warning me-2">{{ analytics.feedbackMetrics.suggestions.pending }}</span>
-                <small>Pending</small>
-              </div>
-              <div class="mb-2">
-                <span class="badge bg-success me-2">{{ analytics.feedbackMetrics.suggestions.implemented }}</span>
-                <small>Implemented</small>
-              </div>
-              <div>
-                <span class="badge bg-secondary me-2">{{ analytics.feedbackMetrics.suggestions.total }}</span>
-                <small>Total</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
   </div>

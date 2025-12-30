@@ -1,13 +1,26 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AnalyticsService } from '../../../services/analytics.service';
-import { 
-  DashboardAnalytics, 
-  ChartData, 
-  RecentActivity 
-} from '../../../interface/analytics.interface';
 import { swalHelper } from '../../../core/constants/swal-helper';
+
+interface WebinarRegistration {
+  webinarId: string;
+  webinarTitle: string;
+  registrationCount: number;
+}
+
+interface AnalyticsData {
+  totalUsers: number;
+  newUsers: number;
+  totalWebinars: number;
+  newWebinars: number;
+  totalEvents: number;
+  newEvents: number;
+  totalRegistrations: number;
+  newRegistrations: number;
+  registrationsPerWebinar: WebinarRegistration[];
+}
 
 @Component({
   selector: 'app-analytics',
@@ -18,194 +31,98 @@ import { swalHelper } from '../../../core/constants/swal-helper';
   styleUrls: ['./analytics.component.css'],
 })
 export class AnalyticsComponent implements OnInit {
-  analytics: DashboardAnalytics = {
-    userMetrics: {
-      total: 0,
-      newToday: 0,
-      newThisMonth: 0,
-      verified: 0,
-      unverified: 0,
-      recentWeek: 0
-    },
-    webinarMetrics: {
-      total: 0,
-      scheduled: 0,
-      live: 0,
-      completed: 0,
-      totalRegistrations: 0,
-      free: 0,
-      paid: 0,
-      recentWeek: 0
-    },
-    eventMetrics: {
-      total: 0,
-      upcoming: 0,
-      past: 0,
-      byType: { event: 0, meeting: 0 },
-      byMode: { online: 0, offline: 0 },
-      recentWeek: 0
-    },
-    feedbackMetrics: {
-      complaints: { total: 0, pending: 0, resolved: 0 },
-      suggestions: { total: 0, pending: 0, implemented: 0 }
-    },
-    summary: {
-      totalUsers: 0,
-      totalWebinars: 0,
-      totalEvents: 0,
-      totalRegistrations: 0,
-      activeWebinars: 0,
-      upcomingEvents: 0
-    }
+  analytics: AnalyticsData = {
+    totalUsers: 0,
+    newUsers: 0,
+    totalWebinars: 0,
+    newWebinars: 0,
+    totalEvents: 0,
+    newEvents: 0,
+    totalRegistrations: 0,
+    newRegistrations: 0,
+    registrationsPerWebinar: []
   };
 
-  chartData: { [key: string]: ChartData } = {
-    users: { labels: [], data: [], total: 0 },
-    webinars: { labels: [], data: [], total: 0 },
-    events: { labels: [], data: [], total: 0 }
-  };
-
-  recentActivities: RecentActivity[] = [];
-  
   loading: boolean = false;
-  chartLoading: boolean = false;
-  activitiesLoading: boolean = false;
-
-  selectedDays: number = 30;
-  selectedChartType: 'users' | 'webinars' | 'events' = 'users';
+  startDate: string = '';
+  endDate: string = '';
+  searchQuery: string = '';
+  filteredWebinars: WebinarRegistration[] = [];
+  maxRegistrations: number = 0;
 
   Math = Math;
 
-  constructor(
-    private analyticsService: AnalyticsService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private analyticsService: AnalyticsService) {}
 
   ngOnInit(): void {
-    this.loadDashboardData();
-    this.loadChartData();
-    this.loadRecentActivities();
+    this.loadAnalytics();
   }
 
-  async loadDashboardData(): Promise<void> {
+  async loadAnalytics(): Promise<void> {
     this.loading = true;
     try {
-      const response = await this.analyticsService.getDashboardAnalytics(this.selectedDays);
+      const response = await this.analyticsService.getDashboardAnalytics(
+        this.startDate, 
+        this.endDate
+      );
+      
       this.analytics = response.data;
-      this.cdr.detectChanges();
+      this.filteredWebinars = [...this.analytics.registrationsPerWebinar];
+      
+      // Calculate max registrations for bar width calculation
+      this.maxRegistrations = Math.max(
+        ...this.analytics.registrationsPerWebinar.map(w => w.registrationCount),
+        1
+      );
+      
     } catch (error) {
-      console.error('Error loading dashboard analytics:', error);
-      swalHelper.showToast('Failed to load dashboard analytics', 'error');
+      console.error('Error loading analytics:', error);
+      swalHelper.showToast('Failed to load analytics', 'error');
     } finally {
       this.loading = false;
-      this.cdr.detectChanges();
     }
   }
 
-  async loadChartData(): Promise<void> {
-    this.chartLoading = true;
-    try {
-      // Load all chart types
-      const [usersChart, webinarsChart, eventsChart] = await Promise.all([
-        this.analyticsService.getChartData('users', this.selectedDays),
-        this.analyticsService.getChartData('webinars', this.selectedDays),
-        this.analyticsService.getChartData('events', this.selectedDays)
-      ]);
-
-      this.chartData = {
-        users: usersChart.data,
-        webinars: webinarsChart.data,
-        events: eventsChart.data
-      };
-
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error loading chart data:', error);
-      swalHelper.showToast('Failed to load chart data', 'error');
-    } finally {
-      this.chartLoading = false;
-      this.cdr.detectChanges();
+  onDateChange(): void {
+    if (this.startDate && this.endDate) {
+      // Validate dates
+      if (new Date(this.startDate) > new Date(this.endDate)) {
+        swalHelper.showToast('Start date cannot be after end date', 'error');
+        return;
+      }
+      this.loadAnalytics();
     }
   }
 
-  async loadRecentActivities(): Promise<void> {
-    this.activitiesLoading = true;
-    try {
-      const response = await this.analyticsService.getRecentActivities(15);
-      this.recentActivities = response.data;
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error loading recent activities:', error);
-      swalHelper.showToast('Failed to load recent activities', 'error');
-    } finally {
-      this.activitiesLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  onDaysChange(): void {
-    this.loadDashboardData();
-    this.loadChartData();
-  }
-
-  onChartTypeChange(): void {
-    this.cdr.detectChanges();
+  clearDates(): void {
+    this.startDate = '';
+    this.endDate = '';
+    this.loadAnalytics();
   }
 
   refreshData(): void {
-    this.loadDashboardData();
-    this.loadChartData();
-    this.loadRecentActivities();
+    this.loadAnalytics();
   }
 
-  getProgressPercentage(current: number, total: number): number {
-    return total > 0 ? Math.round((current / total) * 100) : 0;
-  }
-
-  getMetricIcon(type: string): string {
-    switch (type) {
-      case 'users': return 'bi-people';
-      case 'webinars': return 'bi-camera-video';
-      case 'events': return 'bi-calendar-event';
-      case 'complaints': return 'bi-chat-dots';
-      case 'suggestions': return 'bi-lightbulb';
-      default: return 'bi-graph-up';
+  filterWebinars(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredWebinars = [...this.analytics.registrationsPerWebinar];
+      return;
     }
+
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredWebinars = this.analytics.registrationsPerWebinar.filter(
+      webinar => webinar.webinarTitle.toLowerCase().includes(query)
+    );
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'live': 
-      case 'resolved':
-      case 'implemented': return 'bg-success';
-      case 'scheduled':
-      case 'pending': return 'bg-warning';
-      case 'completed': return 'bg-info';
-      default: return 'bg-secondary';
-    }
+  getBarWidth(count: number): number {
+    if (this.maxRegistrations === 0) return 0;
+    return Math.max((count / this.maxRegistrations) * 100, 5);
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-
-  getCurrentChartData(): ChartData {
-    return this.chartData[this.selectedChartType] || { labels: [], data: [], total: 0 };
-  }
-
-  getChartTitle(): string {
-    switch (this.selectedChartType) {
-      case 'users': return 'User Registrations';
-      case 'webinars': return 'Webinar Creation';
-      case 'events': return 'Event Creation';
-      default: return 'Analytics';
-    }
+  getPercentage(part: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((part / total) * 100);
   }
 }
