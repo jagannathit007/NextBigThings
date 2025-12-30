@@ -85,12 +85,11 @@ export class SuggestionComponent implements OnInit {
       };
 
       const response = await this.suggestionService.getAllSuggestions(requestParams);
-      
-      this.suggestions = response.suggestions.docs;
-      this.analytics = response.analytics;
-      this.totalDocs = response.suggestions.totalDocs;
-      this.filters.page = response.suggestions.page;
-      this.totalPages = response.suggestions.totalPages;
+      this.suggestions = response.data.suggestions.docs;
+      this.analytics = response.data.analytics;
+      this.totalDocs = response.data.suggestions.totalDocs;
+      this.filters.page = response.data.suggestions.page;
+      this.totalPages = response.data.suggestions.totalPages;
       
       this.cdr.detectChanges();
     } catch (error) {
