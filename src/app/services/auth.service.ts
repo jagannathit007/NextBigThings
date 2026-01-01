@@ -5490,3 +5490,229 @@ export class FinanceService {
         }
       }
     }
+
+
+     // Image Category Interfaces and Service
+    export interface ImageCategoryLink {
+      _id: string;
+      url: string;
+      createdAt: string;
+    }
+
+    export interface ImageCategory {
+      _id: string;
+      name: string;
+      links: ImageCategoryLink[];
+      status: boolean;
+      createdAt: string;
+      __v: number;
+    }
+
+    export interface ImageCategoryResponse {
+      docs: ImageCategory[];
+      totalDocs: string | number;
+      limit: number;
+      page: number;
+      totalPages: number;
+      pagingCounter: number;
+      hasPrevPage: boolean;
+      hasNextPage: boolean;
+      prevPage: number | null;
+      nextPage: number | null;
+    }
+
+    @Injectable({
+      providedIn: 'root',
+    })
+    export class ImageCategoryService {
+      private headers: any = [];
+      
+      constructor(private apiManager: ApiManager, private storage: AppStorage) {}
+      
+      private getHeaders = () => {
+        this.headers = [];
+        let token = this.storage.get(common.TOKEN);
+        
+        if (token != null) {
+          this.headers.push({ Authorization: `Bearer ${token}` });
+        }
+      };
+
+      async getImageCategories(data: { page: number; limit: number; search: string }): Promise<ImageCategoryResponse> {
+        try {
+          this.getHeaders();
+          
+          let queryParams = `?page=${data.page}&limit=${data.limit}`;
+          if (data.search) {
+            queryParams += `&search=${encodeURIComponent(data.search)}`;
+          }
+          
+          const response = await this.apiManager.request(
+            {
+              url: apiEndpoints.GET_IMAGE_CATEGORIES + queryParams,
+              method: 'GET',
+            },
+            null,
+            this.headers
+          );
+          
+          return response.data || response;
+        } catch (error) {
+          console.error('API Error:', error);
+          swalHelper.showToast('Failed to fetch categories', 'error');
+          throw error;
+        }
+      }
+
+      async createImageCategory(data: { name: string; status: boolean; links: any[] }): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: apiEndpoints.CREATE_IMAGE_CATEGORY,
+              method: 'POST',
+            },
+            data,
+            this.headers
+          );
+          
+          return response;
+        } catch (error: any) {
+          console.error('Create Image Category Error:', error);
+          
+          if (error && error.error) {
+            return error.error;
+          }
+          
+          swalHelper.showToast('Failed to create category', 'error');
+          throw error;
+        }
+      }
+
+      async updateImageCategory(id: string, data: { name: string; status: boolean; links: any[] }): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.UPDATE_IMAGE_CATEGORY}/${id}`,
+              method: 'PUT',
+            },
+            data,
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Update Image Category Error:', error);
+          swalHelper.showToast('Failed to update category', 'error');
+          throw error;
+        }
+      }
+
+      async getImageCategoryById(id: string): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.GET_IMAGE_CATEGORY_BY_ID}/${id}`,
+              method: 'GET',
+            },
+            null,
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Get Image Category By ID Error:', error);
+          swalHelper.showToast('Failed to fetch category details', 'error');
+          throw error;
+        }
+      }
+
+      async deleteImageCategory(id: string): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.DELETE_IMAGE_CATEGORY}/${id}`,
+              method: 'DELETE',
+            },
+            null,
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Delete Image Category Error:', error);
+          swalHelper.showToast('Failed to delete category', 'error');
+          throw error;
+        }
+      }
+
+      async addLinkToCategory(id: string, url: string): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.ADD_LINK_TO_CATEGORY}/${id}`,
+              method: 'POST',
+            },
+            { url },
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Add Link Error:', error);
+          swalHelper.showToast('Failed to add link', 'error');
+          throw error;
+        }
+      }
+
+      async updateLinkInCategory(id: string, linkId: string, url: string): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.UPDATE_LINK_IN_CATEGORY}/${id}/${linkId}`,
+              method: 'PUT',
+            },
+            { url },
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Update Link Error:', error);
+          swalHelper.showToast('Failed to update link', 'error');
+          throw error;
+        }
+      }
+
+      async deleteLinkFromCategory(id: string, linkId: string): Promise<any> {
+        try {
+          this.getHeaders();
+          
+          const response = await this.apiManager.request(
+            {
+              url: `${apiEndpoints.DELETE_LINK_FROM_CATEGORY}/${id}/${linkId}`,
+              method: 'DELETE',
+            },
+            null,
+            this.headers
+          );
+          
+          return response;
+        } catch (error) {
+          console.error('Delete Link Error:', error);
+          swalHelper.showToast('Failed to delete link', 'error');
+          throw error;
+        }
+      }
+    }

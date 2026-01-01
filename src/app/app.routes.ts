@@ -55,6 +55,7 @@ import { GoalsComponent } from './views/pages/goals/goals.component';
 import { LTPointsComponent } from './views/pages/LT Points/ltPoints.component';
 import { ComplainComponent } from './views/pages/complain/complain.component';
 import { SuggestionComponent } from './views/pages/suggestion/suggestion.component';
+import { ImageCategoryComponent } from './views/pages/image-category/image-category.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'adminLogin' },
@@ -127,6 +128,8 @@ export const routes: Routes = [
 {path: 'goals', component: GoalsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'complain', component: ComplainComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
 {path: 'suggestion', component: SuggestionComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
+{path: 'imageCategory', component: ImageCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'advisoryBoard', 'supportDirector', 'supportAmbassador'] } },
+
 
     ],
   },

@@ -134,6 +134,11 @@ export class SideBarService {
               link: 'batch',
               icon: 'collection',
             },
+            {
+              title: 'Image Categories',
+              link: 'imageCategory',
+              icon: 'image',
+            }
             // {
             //   title: 'Sub Categories',
             //   link: 'subcategory',

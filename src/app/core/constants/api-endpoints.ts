@@ -223,6 +223,17 @@ public GET_RECENT_ACTIVITIES = `${this.PATH}/getRecentActivities`;
   public GET_WEBINAR_ANALYTICS: string = `${this.PATH}/getAnalytics`;
 
 
+  // Image Categories APIs
+public CREATE_IMAGE_CATEGORY:string=`${this.PATH}/createImageCategory`
+public GET_IMAGE_CATEGORIES:string=`${this.PATH}/getImageCategories`
+public UPDATE_IMAGE_CATEGORY:string=`${this.PATH}/updateImageCategory`
+public DELETE_IMAGE_CATEGORY:string=`${this.PATH}/deleteImageCategory`
+public GET_IMAGE_CATEGORY_BY_ID:string=`${this.PATH}/getImageCategoryById`
+public ADD_LINK_TO_CATEGORY:string=`${this.PATH}/addLinkToCategory`
+public UPDATE_LINK_IN_CATEGORY:string=`${this.PATH}/updateLinkInCategory`
+public DELETE_LINK_FROM_CATEGORY:string=`${this.PATH}/deleteLinkFromCategory`
+
+
 
   // golas management
   public GET_ALL_GOALS: string = `${this.PATH1}/mobile/admin/goals/users`;
