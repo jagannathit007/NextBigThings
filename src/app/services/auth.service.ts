@@ -1817,9 +1817,9 @@ export class EventService {
         );
         
         return response;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Delete Session Error:', error);
-        swalHelper.showToast('Failed to delete session', 'error');
+        swalHelper.showToast(error.error.message, 'error');
         throw error;
       }
     }

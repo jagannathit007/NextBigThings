@@ -452,11 +452,11 @@ export class SessionsComponent implements OnInit, AfterViewInit {
             swalHelper.showToast('Session deleted successfully', 'success');
             this.fetchSessions();
           } else {
-            swalHelper.showToast(response.message || 'Failed to delete session', 'error');
+            // swalHelper.showToast(response.message || 'Failed to delete session', 'error');
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error deleting session:', error);
-          swalHelper.showToast('Failed to delete session', 'error');
+          swalHelper.showToast(error.error.message, 'warning');
         } finally {
           this.loading = false;
         }
